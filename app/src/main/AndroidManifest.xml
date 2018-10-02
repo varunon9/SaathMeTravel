@@ -36,20 +36,32 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.LAUNCHER" />
 
                 <!-- Accepts URIs that begin with "https://saathmetravel.com/app” -->
-                <data android:scheme="https"
+                <data
                     android:host="saathmetravel.com"
-                    android:pathPrefix="/app" />
+                    android:pathPrefix="/app"
+                    android:scheme="https" />
 
-                <!-- note that the leading "/" is required for pathPrefix-->
+                <!-- note that the leading "/" is required for pathPrefix -->
                 <!-- Accepts URIs that begin with "saathmetravel://app” -->
-                <data android:scheme="saathmetravel"
-                    android:host="app" />
+                <data
+                    android:host="app"
+                    android:scheme="saathmetravel" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".JourneyPlannerActivity"
+            android:label="@string/title_activity_journey_planner"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.varunon9.saathmetravel.MainActivity" />
         </activity>
     </application>
 

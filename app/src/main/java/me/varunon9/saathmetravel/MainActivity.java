@@ -9,7 +9,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -38,7 +37,6 @@ public class MainActivity extends AppCompatActivity
 
     private GoogleMap mMap;
     private ContextUtility contextUtility;
-    private LocationManager locationManager;
     private static final String TAG = "MainActivity";
     private Singleton singleton;
     private boolean doubleBackToExitPressedOnce = false;
@@ -70,7 +68,6 @@ public class MainActivity extends AppCompatActivity
 
 
         contextUtility = new ContextUtility(this);
-        locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
 
         // check if internet connection is available
         if (!contextUtility.isConnectedToNetwork()) {
@@ -173,7 +170,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         contextUtility.showLocationOnMap(mMap, location, AppConstants.CURRENT_LOCATION_MARKER,
-                true, 15);
+                true, 12);
     }
 
     @Override
@@ -188,7 +185,7 @@ public class MainActivity extends AppCompatActivity
                     Location location = singleton.getCurrentLocation();
                     mMap.clear(); // clear initial marker
                     contextUtility.showLocationOnMap(mMap, location, AppConstants.CURRENT_LOCATION_MARKER,
-                            true, 15);
+                            true, 12);
                 } else {
                     // permission denied, show user toast notification
                     Toast.makeText(this, AppConstants.ACCESS_LOCATION_TOAST_MESSAGE,
@@ -227,12 +224,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showMessage(String message) {
-        View parentLayout = findViewById(R.id.mainActivityContent);
+        View parentLayout = findViewById(R.id.activityContent);
         Snackbar.make(parentLayout, message, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
         return false;
+    }
+
+    // calling from XML hence public
+    public void goToJourneyPlannerActivity(View view) {
+        Intent intent = new Intent(MainActivity.this, JourneyPlannerActivity.class);
+        startActivity(intent);
     }
 }

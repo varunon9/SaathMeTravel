@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
-    android:id="@+id/mainActivityContent"
+    android:id="@+id/activityContent"
     tools:showIn="@layout/app_bar_main">
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,6 +16,36 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="me.varunon9.sellmyservices.MainActivity" />
+        tools:context="me.varunon9.saathmetravel.MainActivity" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="14dp"
+        tools:layout_editor_absoluteY="113dp">
+
+
+        <TextView
+            android:id="@+id/startJourneyTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/start_journey_text_vertical_margin"
+            android:background="@drawable/shadow_border"
+            android:ems="10"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:text="@string/start_journey_text_title"
+            android:textSize="@dimen/start_journey_text_size"
+            android:drawableLeft="@drawable/ic_time_to_leave"
+            android:drawablePadding="@dimen/activity_horizontal_margin"
+            android:gravity="fill"
+            android:onClick="goToJourneyPlannerActivity" />
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
