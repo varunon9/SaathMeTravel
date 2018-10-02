@@ -22,40 +22,42 @@
 
         <LinearLayout
             android:orientation="vertical"
-            android:background="@drawable/shadow_border"
+            android:padding="@dimen/activity_horizontal_margin"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@drawable/shadow_border">
 
-            <EditText
-                android:id="@+id/sourceLocationEditText"
+            <LinearLayout
+                android:orientation="vertical"
+                android:background="@drawable/plain_border"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="@dimen/activity_horizontal_margin"
-                android:ems="10"
-                android:padding="@dimen/activity_horizontal_margin"
-                android:inputType="text"
-                android:hint="@string/enter_source_hint_text"
-                android:imeOptions="actionSearch"
-                android:gravity="fill"
-                android:background="@drawable/plain_border"/>
+                android:layout_height="wrap_content">
 
-            <EditText
-                android:id="@+id/destinationLocationEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                <fragment
+                    android:id="@+id/source_autocomplete_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/plain_border"
+                    android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:background="@drawable/plain_border"
                 android:layout_marginTop="@dimen/activity_horizontal_margin"
-                android:layout_marginBottom="@dimen/activity_horizontal_margin"
-                android:ems="10"
-                android:padding="@dimen/activity_horizontal_margin"
-                android:inputType="text"
-                android:hint="@string/enter_destination_hint_text"
-                android:imeOptions="actionSearch"
-                android:gravity="fill"
-                android:background="@drawable/plain_border"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <fragment
+                    android:id="@+id/destination_autocomplete_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/plain_border"
+                    android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>
