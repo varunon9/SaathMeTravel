@@ -10,6 +10,7 @@ public final class AppConstants {
     }
 
     public static final int ACCESS_LOCATION_REQUEST_CODE = 1;
+    public static final int LOGIN_REQUEST_CODE = 2;
     public static final String ACCESS_LOCATION_TOAST_MESSAGE =
             "Please grant location permission to use this service";
     public static final String CURRENT_LOCATION_MARKER = "You are here";

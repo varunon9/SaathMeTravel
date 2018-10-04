@@ -24,6 +24,7 @@ import static com.google.android.gms.location.places.AutocompleteFilter.TYPE_FIL
 public class JourneyPlannerActivity extends AppCompatActivity {
 
     private String TAG = "JourneyPlannerActivity";
+    private Singleton singleton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,7 @@ public class JourneyPlannerActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        singleton = Singleton.getInstance(getApplicationContext());
 
         PlaceAutocompleteFragment sourceAutocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.source_autocomplete_fragment);
@@ -67,13 +69,13 @@ public class JourneyPlannerActivity extends AppCompatActivity {
             @Override
             public void onPlaceSelected(Place place) {
                 String placeAddress = place.getAddress().toString();
-                LatLng latlng = place.getLatLng();
                 Log.i(TAG, "Place: " + placeAddress);
+                singleton.setSourcePlace(place);
             }
 
             @Override
             public void onError(Status status) {
-                Log.i(TAG, "An error occurred: " + status);
+                Log.e(TAG, "An error occurred: " + status);
                 showMessage(AppConstants.GENERIC_ERROR_MESSAGE + " Status: " + status);
             }
         });
@@ -81,13 +83,13 @@ public class JourneyPlannerActivity extends AppCompatActivity {
             @Override
             public void onPlaceSelected(Place place) {
                 String placeAddress = place.getAddress().toString();
-                LatLng latlng = place.getLatLng();
                 Log.i(TAG, "Place: " + placeAddress);
+                singleton.setDestinationPlace(place);
             }
 
             @Override
             public void onError(Status status) {
-                Log.i(TAG, "An error occurred: " + status);
+                Log.e(TAG, "An error occurred: " + status);
                 showMessage(AppConstants.GENERIC_ERROR_MESSAGE + " Status: " + status);
             }
         });

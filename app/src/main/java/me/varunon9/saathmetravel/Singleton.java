@@ -8,9 +8,12 @@ import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.location.places.Place;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 /**
- * Created by varunkumar on 02/9/18.
+ * This class contains global variables
  */
 
 public class Singleton {
@@ -19,6 +22,10 @@ public class Singleton {
     private Context context;
     private LocationManager locationManager;
     private String TAG = "Singleton";
+    private FirebaseUser firebaseUser;
+    private boolean checkUserLogin = true;
+    private Place sourcePlace;
+    private Place destinationPlace;
 
     private Singleton(Context context) {
         this.context = context;
@@ -32,7 +39,7 @@ public class Singleton {
         return singleton;
     }
 
-    public RequestQueue getRequestQueue() {
+    private RequestQueue getRequestQueue() {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(context);
         }
@@ -50,5 +57,33 @@ public class Singleton {
                 locationManager.getBestProvider(criteria, false)
         );
         return location;
+    }
+
+    public FirebaseUser getFirebaseUser() {
+        if (firebaseUser == null && checkUserLogin) {
+            firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            checkUserLogin = false; // only one time
+        }
+        return firebaseUser;
+    }
+
+    public void setFirebaseUser(FirebaseUser firebaseUser) {
+        this.firebaseUser = firebaseUser;
+    }
+
+    public Place getSourcePlace() {
+        return sourcePlace;
+    }
+
+    public void setSourcePlace(Place sourcePlace) {
+        this.sourcePlace = sourcePlace;
+    }
+
+    public Place getDestinationPlace() {
+        return destinationPlace;
+    }
+
+    public void setDestinationPlace(Place destinationPlace) {
+        this.destinationPlace = destinationPlace;
     }
 }

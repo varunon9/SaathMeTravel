@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -21,12 +22,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Arrays;
+import java.util.List;
 
 import me.varunon9.saathmetravel.constants.AppConstants;
 import me.varunon9.saathmetravel.utils.ContextUtility;
@@ -74,6 +86,7 @@ public class MainActivity extends AppCompatActivity
             Snackbar.make(mapView, AppConstants.INTERNET_CONNECTION_IS_MANDATORY, Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
         }
+        checkLoginAndUpdateUi(navigationView);
     }
 
     @Override
@@ -127,16 +140,13 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.nav_share) {
-            shareApp();
+            contextUtility.shareApp();
         } else if (id == R.id.nav_rate) {
-            rateApp();
+            contextUtility.rateApp();
+        } else if (id == R.id.nav_login) {
+            firebaseLogin();
         } else if (id == R.id.nav_logout) {
-
-            // refreshing MainActivity
-            Intent intent = getIntent();
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            finish();
-            startActivity(intent);
+            firebaseLogout();
         } else {
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             drawer.closeDrawer(GravityCompat.START);
@@ -174,6 +184,34 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case AppConstants.LOGIN_REQUEST_CODE: {
+                IdpResponse response = IdpResponse.fromResultIntent(data);
+
+                if (resultCode == RESULT_OK) {
+                    // Successfully signed in
+                    FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                    Log.i(TAG,firebaseUser.getDisplayName()
+                            + ", " + firebaseUser.getEmail()
+                            + ", " + firebaseUser.getPhoneNumber() + ", " + firebaseUser.toString());
+                    singleton.setFirebaseUser(firebaseUser);
+                    refreshMainActivity();
+                } else {
+                    // Sign in failed. If response is null the user canceled the
+                    // sign-in flow using the back button. Otherwise check
+                    // response.getError().getErrorCode() and handle the error.
+                    if (response != null) {
+                        int errorCode = response.getError().getErrorCode();
+                        showMessage(errorCode + ": " + AppConstants.GENERIC_ERROR_MESSAGE);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[],
                                            int[] grantResults) {
@@ -196,30 +234,52 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void shareApp() {
-        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-        sharingIntent.setType("text/plain");
-        String shareBody = AppConstants.shareAppBody;
-        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
-                AppConstants.shareAppSubject);
-        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-        startActivity(Intent.createChooser(sharingIntent, "Share via"));
-    }
-
-    private void rateApp() {
-        Uri uri = Uri.parse("market://details?id=" + this.getPackageName());
-        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
-        // To count with Play market backstack, After pressing back button,
-        // to taken back to our application, we need to add following flags to intent.
-        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY
-                | Intent.FLAG_ACTIVITY_NEW_DOCUMENT
-                | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+    private void checkLoginAndUpdateUi(NavigationView navigationView ) {
+        FirebaseUser firebaseUser = singleton.getFirebaseUser();
         try {
-            startActivity(goToMarket);
-        } catch (ActivityNotFoundException e) {
-            startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("http://play.google.com/store/apps/details?id="
-                            + this.getPackageName())));
+            View navigationDrawerHeaderLayout = navigationView.getHeaderView(0);
+            Menu navigationDrawerMenu = navigationView.getMenu();
+
+            ImageView navigationHeaderImageView = navigationDrawerHeaderLayout
+                    .findViewById(R.id.navigationHeaderImageView);
+            TextView navigationHeaderTitleTextView = navigationDrawerHeaderLayout
+                    .findViewById(R.id.navigationHeaderTitleTextView);
+            TextView navigationHeaderSubTitleTextView = navigationDrawerHeaderLayout
+                    .findViewById(R.id.navigationHeaderSubTitleTextView);
+
+            MenuItem profileMenuItem = navigationDrawerMenu.findItem(R.id.nav_profile);
+            MenuItem loginMenuItem = navigationDrawerMenu.findItem(R.id.nav_login);
+            MenuItem logoutMenuItem = navigationDrawerMenu.findItem(R.id.nav_logout);
+
+            if (firebaseUser == null) {
+                // user is not logged in
+                profileMenuItem.setVisible(false);
+                logoutMenuItem.setVisible(false);
+            } else {
+                String displayName = firebaseUser.getDisplayName();
+                String email = firebaseUser.getEmail();
+                Uri photoUrl = firebaseUser.getPhotoUrl();
+                String phoneNumber = firebaseUser.getPhoneNumber();
+
+                loginMenuItem.setVisible(false);
+
+                if (displayName != null) {
+                    navigationHeaderTitleTextView.setText(displayName);
+                } else if (phoneNumber != null) {
+                    navigationHeaderTitleTextView.setText(phoneNumber);
+                } else if (email != null) {
+                    navigationHeaderTitleTextView.setText(email);
+                }
+
+                if (email != null) {
+                    navigationHeaderSubTitleTextView.setText(email);
+                }
+
+                // todo set profile pic when loggedIn
+                navigationHeaderImageView.setImageResource(R.mipmap.ic_account);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -236,6 +296,43 @@ public class MainActivity extends AppCompatActivity
     // calling from XML hence public
     public void goToJourneyPlannerActivity(View view) {
         Intent intent = new Intent(MainActivity.this, JourneyPlannerActivity.class);
+        startActivity(intent);
+    }
+
+    private void firebaseLogin() {
+        // Choose authentication providers
+        List<AuthUI.IdpConfig> providers = Arrays.asList(
+                new AuthUI.IdpConfig.EmailBuilder().build(),
+                new AuthUI.IdpConfig.PhoneBuilder().build(),
+                new AuthUI.IdpConfig.GoogleBuilder().build());
+
+        // Create and launch sign-in intent
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .setIsSmartLockEnabled(!BuildConfig.DEBUG /* credentials */, true /* hints */)
+                        .setLogo(R.mipmap.ic_launcher)
+                        .setTheme(R.style.AppTheme)
+                        .build(),
+                AppConstants.LOGIN_REQUEST_CODE);
+    }
+
+    private void firebaseLogout() {
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    public void onComplete(@NonNull Task<Void> task) {
+                        singleton.setFirebaseUser(null);
+                        refreshMainActivity();
+                    }
+                });
+    }
+
+    private void refreshMainActivity() {
+        Intent intent = getIntent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        finish();
         startActivity(intent);
     }
 }
