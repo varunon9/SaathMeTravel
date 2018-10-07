@@ -42,6 +42,14 @@
 
             </LinearLayout>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginTop="@dimen/nav_header_vertical_spacing"
+                android:textSize="@dimen/info_text_size"
+                android:text="@string/enter_source_info"/>
+
             <LinearLayout
                 android:orientation="vertical"
                 android:background="@drawable/plain_border"
@@ -58,7 +66,71 @@
 
             </LinearLayout>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginTop="@dimen/nav_header_vertical_spacing"
+                android:textSize="@dimen/info_text_size"
+                android:text="@string/enter_destination_info"/>
+
         </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shadow_border">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/select_range_text"/>
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/nav_header_vertical_spacing"
+                android:layout_marginLeft="-5dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/range5RadioButton"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="5 KM"
+                    android:onClick="onRangeRadioButtonClicked" />
+
+                <RadioButton
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/range10RadioButton"
+                    android:layout_weight="1"
+                    android:text="10 KM"
+                    android:onClick="onRangeRadioButtonClicked" />
+
+                <RadioButton
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/range20RadioButton"
+                    android:layout_weight="1"
+                    android:text="20 KM"
+                    android:onClick="onRangeRadioButtonClicked" />
+
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/colorWhite"
+            android:text="@string/search_travellers"
+            android:onClick="onSearchTravellersButtonClicked"/>
 
     </LinearLayout>
 

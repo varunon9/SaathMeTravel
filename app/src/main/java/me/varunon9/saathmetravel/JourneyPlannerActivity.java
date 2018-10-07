@@ -1,5 +1,6 @@
 package me.varunon9.saathmetravel;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
@@ -25,6 +27,7 @@ public class JourneyPlannerActivity extends AppCompatActivity {
 
     private String TAG = "JourneyPlannerActivity";
     private Singleton singleton;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,5 +107,56 @@ public class JourneyPlannerActivity extends AppCompatActivity {
     private void showMessage(String message) {
         View parentLayout = findViewById(R.id.activityContent);
         Snackbar.make(parentLayout, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    private void showProgressDialog(String title, String message, boolean isCancellable) {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(JourneyPlannerActivity.this);
+        }
+        progressDialog.setTitle(title);
+        progressDialog.setMessage(message);
+        progressDialog.setCancelable(isCancellable);
+        progressDialog.show();
+    }
+
+    private void dismissProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+    }
+
+    public void onRangeRadioButtonClicked(View view) {
+        boolean checked = ((RadioButton) view).isChecked();
+
+        switch(view.getId()) {
+            case R.id.range5RadioButton: {
+                if (checked) {
+                    singleton.setFilterRange(5);
+                }
+                break;
+            }
+            case R.id.range10RadioButton: {
+                if (checked) {
+                    singleton.setFilterRange(10);
+                }
+                break;
+            }
+            case R.id.range20RadioButton: {
+                if (checked) {
+                    singleton.setFilterRange(20);
+                }
+                break;
+            }
+        }
+    }
+
+    public void onSearchTravellersButtonClicked(View view) {
+        Place sourcePlace = singleton.getSourcePlace();
+        Place destinationPlace = singleton.getDestinationPlace();
+        int range = singleton.getFilterRange();
+
+        if (sourcePlace == null) {
+
+        }
     }
 }

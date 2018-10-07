@@ -26,10 +26,12 @@ public class Singleton {
     private boolean checkUserLogin = true;
     private Place sourcePlace;
     private Place destinationPlace;
+    private int filterRange;
 
     private Singleton(Context context) {
         this.context = context;
         requestQueue = getRequestQueue();
+        filterRange = 5; // 5 KM by default
     }
 
     public static synchronized Singleton getInstance(Context context) {
@@ -39,7 +41,7 @@ public class Singleton {
         return singleton;
     }
 
-    private RequestQueue getRequestQueue() {
+    public RequestQueue getRequestQueue() {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(context);
         }
@@ -63,12 +65,16 @@ public class Singleton {
         if (firebaseUser == null && checkUserLogin) {
             firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
             checkUserLogin = false; // only one time
+
+            // todo: save user location
         }
         return firebaseUser;
     }
 
     public void setFirebaseUser(FirebaseUser firebaseUser) {
         this.firebaseUser = firebaseUser;
+
+        // todo: save user location
     }
 
     public Place getSourcePlace() {
@@ -85,5 +91,13 @@ public class Singleton {
 
     public void setDestinationPlace(Place destinationPlace) {
         this.destinationPlace = destinationPlace;
+    }
+
+    public int getFilterRange() {
+        return filterRange;
+    }
+
+    public void setFilterRange(int filterRange) {
+        this.filterRange = filterRange;
     }
 }

@@ -13,4 +13,12 @@
     <string name="title_activity_journey_planner">Start Your Journey</string>
     <string name="enter_source_hint_text">Enter source</string>
     <string name="enter_destination_hint_text">Enter destination</string>
+    <string name="enter_source_info">Travellers around this location will be shown on map.</string>
+    <string name="enter_destination_info">
+        Travellers going towards this location will be shown on map.
+    </string>
+    <string name="select_range_text">
+        Select range
+    </string>
+    <string name="search_travellers">Search Travellers</string>
 </resources>
