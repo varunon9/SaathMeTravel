@@ -23,5 +23,7 @@ public final class AppConstants {
             "A social travelling app to match the travellers sharing a common journey."
             + "\nDownload the app now"
             + "\nhttps://play.google.com/store/apps/details?id=me.varunon9.saathmetravel";
+    public static final String userDefaultPreference = "I like mostly trekking and sightseeing"
+            + " and expecting similar preference from fellow travellers.";
 
 }
