@@ -26,4 +26,17 @@ public final class AppConstants {
     public static final String userDefaultPreference = "I like mostly trekking and sightseeing"
             + " and expecting similar preference from fellow travellers.";
 
+    public static class Gender {
+        private Gender() {}
+
+        public static final String MALE = "male";
+        public static final String FEMALE = "female";
+    }
+
+    public static class Collections {
+        private Collections() {}
+
+        public static final String USERS = "users";
+    }
+
 }

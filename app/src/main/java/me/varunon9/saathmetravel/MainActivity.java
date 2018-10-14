@@ -1,11 +1,9 @@
 package me.varunon9.saathmetravel;
 
 import android.Manifest;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,10 +36,16 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import me.varunon9.saathmetravel.constants.AppConstants;
+import me.varunon9.saathmetravel.models.User;
 import me.varunon9.saathmetravel.utils.ContextUtility;
+import me.varunon9.saathmetravel.utils.FirestoreDbOperationCallback;
+import me.varunon9.saathmetravel.utils.FirestoreDbUtility;
+import me.varunon9.saathmetravel.utils.GeneralUtility;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -52,6 +56,8 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     private Singleton singleton;
     private boolean doubleBackToExitPressedOnce = false;
+    private GeneralUtility generalUtility;
+    private FirestoreDbUtility firestoreDbUtility;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +86,8 @@ public class MainActivity extends AppCompatActivity
 
 
         contextUtility = new ContextUtility(this);
+        generalUtility = new GeneralUtility();
+        firestoreDbUtility = new FirestoreDbUtility();
 
         // check if internet connection is available
         if (!contextUtility.isConnectedToNetwork()) {
@@ -96,6 +104,7 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if (doubleBackToExitPressedOnce) {
+                // todo: set isOnline false, update lastSeen if user is loggedIn
                 super.onBackPressed();
                 return;
             }
@@ -197,6 +206,20 @@ public class MainActivity extends AppCompatActivity
                             + ", " + firebaseUser.getEmail()
                             + ", " + firebaseUser.getPhoneNumber() + ", " + firebaseUser.toString());
                     singleton.setFirebaseUser(firebaseUser);
+
+                    // create user if not already created
+                    User user = generalUtility.convertFirebaseUserToUser(firebaseUser,
+                            singleton.getCurrentLocation());
+                    firestoreDbUtility.createOrMerge(AppConstants.Collections.USERS,
+                            user.getUid(), user, new FirestoreDbOperationCallback() {
+                                @Override
+                                public void onSuccess() {
+                                }
+
+                                @Override
+                                public void onFailure() {
+                                }
+                            });
                     refreshMainActivity();
                 } else {
                     // Sign in failed. If response is null the user canceled the
@@ -275,8 +298,22 @@ public class MainActivity extends AppCompatActivity
                     navigationHeaderSubTitleTextView.setText(email);
                 }
 
-                // todo set profile pic when loggedIn
+                // todo: set profile pic when loggedIn
                 navigationHeaderImageView.setImageResource(R.mipmap.ic_account);
+
+                // set isOnline true and update user's location
+                Map<String, Object> user = new HashMap<>();
+                user.put("online", true);
+                firestoreDbUtility.update(AppConstants.Collections.USERS,
+                        firebaseUser.getUid(), user, new FirestoreDbOperationCallback() {
+                            @Override
+                            public void onSuccess() {
+                            }
+
+                            @Override
+                            public void onFailure() {
+                            }
+                        });
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -324,6 +361,8 @@ public class MainActivity extends AppCompatActivity
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
                         singleton.setFirebaseUser(null);
+
+                        // todo: update isOnline and lastSeen
                         refreshMainActivity();
                     }
                 });
