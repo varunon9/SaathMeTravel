@@ -11,7 +11,7 @@ public class User {
 
     private String email;
     private String gender;
-    private GeoPoint location;
+    private GeoPoint location; // user's current location
     private String mobile;
     private String name;
     private String preference;

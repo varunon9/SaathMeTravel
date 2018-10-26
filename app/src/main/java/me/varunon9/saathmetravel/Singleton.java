@@ -48,16 +48,22 @@ public class Singleton {
         return requestQueue;
     }
 
-    public Location getCurrentLocation()
-            throws SecurityException {
+    public Location getCurrentLocation() {
         if (locationManager == null) {
             locationManager =
                     (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
         }
         Criteria criteria = new Criteria();
-        Location location = locationManager.getLastKnownLocation(
-                locationManager.getBestProvider(criteria, false)
-        );
+        Location location = null;
+        try {
+            location = locationManager.getLastKnownLocation(
+                    locationManager.getBestProvider(criteria, false)
+            );
+        } catch (SecurityException e) {
+            e.printStackTrace(); // permission denied
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return location;
     }
 
@@ -65,16 +71,12 @@ public class Singleton {
         if (firebaseUser == null && checkUserLogin) {
             firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
             checkUserLogin = false; // only one time
-
-            // todo: save user location
         }
         return firebaseUser;
     }
 
     public void setFirebaseUser(FirebaseUser firebaseUser) {
         this.firebaseUser = firebaseUser;
-
-        // todo: save user location
     }
 
     public Place getSourcePlace() {

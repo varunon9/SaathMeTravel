@@ -21,7 +21,9 @@ public class GeneralUtility {
         user.setMobile(firebaseUser.getPhoneNumber());
         user.setName(firebaseUser.getDisplayName());
         user.setUid(firebaseUser.getUid());
-        user.setPhotoUrl(firebaseUser.getPhotoUrl().toString());
+        if (firebaseUser.getPhotoUrl() != null) {
+            user.setPhotoUrl(firebaseUser.getPhotoUrl().toString());
+        }
 
         return user;
     }

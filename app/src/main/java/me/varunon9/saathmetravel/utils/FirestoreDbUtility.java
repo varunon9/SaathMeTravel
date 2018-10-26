@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
@@ -30,7 +31,7 @@ public class FirestoreDbUtility {
                                 + collectionName
                                 + " "
                                 + documentName);
-                        callback.onSuccess();
+                        callback.onSuccess(null);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -40,13 +41,13 @@ public class FirestoreDbUtility {
                                 + collectionName
                                 + " "
                                 + documentName);
-                        callback.onFailure();
+                        callback.onFailure(null);
                     }
                 });
     }
 
     public void update(final String collectionName, final String documentName,
-                       Map hashMap, final FirestoreDbOperationCallback callback) {
+                       final Map hashMap, final FirestoreDbOperationCallback callback) {
         db.collection(collectionName).document(documentName)
                 .update(hashMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -55,8 +56,11 @@ public class FirestoreDbUtility {
                         Log.i(TAG, "update success: "
                                 + collectionName
                                 + " "
-                                + documentName);
-                        callback.onSuccess();
+                                + documentName
+                                + " "
+                                + hashMap.toString()
+                        );
+                        callback.onSuccess(null);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -66,8 +70,32 @@ public class FirestoreDbUtility {
                                 + collectionName
                                 + " "
                                 + documentName);
-                        callback.onFailure();
+                        callback.onFailure(null);
                     }
                 });
     }
+
+    public void getOne(final String collectionName, final String documentName,
+                       final FirestoreDbOperationCallback callback) {
+        db.collection(collectionName).document(documentName)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        callback.onSuccess(documentSnapshot);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onFailure(null);
+                    }
+                });
+    }
+
+    // this is not generalized
+    //public void getFellowTravellers()
+        // https://stackoverflow.com/questions/46630507/how-to-run-a-geo-nearby-query-with-firestore
+    // https://firebase.google.com/docs/firestore/query-data/queries
+    // https://firebase.google.com/docs/firestore/query-data/get-data
 }

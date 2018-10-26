@@ -51,14 +51,11 @@ public class JourneyPlannerActivity extends AppCompatActivity {
         sourceAutocompleteFragment.setFilter(autocompleteFilter);
         destinationAutocompleteFragment.setFilter(autocompleteFilter);
 
-        // changing hint and icon
-        sourceAutocompleteFragment.setHint(
-                getResources().getString(R.string.enter_source_hint_text)
-        );
-        destinationAutocompleteFragment.setHint(
-                getResources().getString(R.string.enter_destination_hint_text)
-        );
+        // setting hint or selected places
+        setSelectedSourceAndDestinationPlace(sourceAutocompleteFragment,
+                destinationAutocompleteFragment);
 
+        // changing icon
         ImageView sourceSearchIcon = (ImageView)((LinearLayout)sourceAutocompleteFragment
                 .getView()).getChildAt(0);
         sourceSearchIcon.setImageResource(R.drawable.ic_time_to_leave);
@@ -157,6 +154,32 @@ public class JourneyPlannerActivity extends AppCompatActivity {
 
         if (sourcePlace == null) {
 
+        }
+        // todo: get fellow travellers data and pass to MainActivity via Bundle
+        // todo: show user `No Travellers Found` message
+    }
+
+    private void setSelectedSourceAndDestinationPlace(
+            PlaceAutocompleteFragment sourceAutocompleteFragment,
+            PlaceAutocompleteFragment destinationAutocompleteFragment) {
+
+        Place sourcePlace = singleton.getSourcePlace();
+        Place destinationPlace = singleton.getDestinationPlace();
+
+        if (sourcePlace != null) {
+            sourceAutocompleteFragment.setText(sourcePlace.getAddress().toString());
+        } else {
+            sourceAutocompleteFragment.setHint(
+                    getResources().getString(R.string.enter_source_hint_text)
+            );
+        }
+
+        if (destinationPlace != null) {
+            destinationAutocompleteFragment.setText(destinationPlace.getAddress().toString());
+        } else {
+            destinationAutocompleteFragment.setHint(
+                    getResources().getString(R.string.enter_destination_hint_text)
+            );
         }
     }
 }

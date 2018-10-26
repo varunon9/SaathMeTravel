@@ -34,6 +34,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -213,11 +214,11 @@ public class MainActivity extends AppCompatActivity
                     firestoreDbUtility.createOrMerge(AppConstants.Collections.USERS,
                             user.getUid(), user, new FirestoreDbOperationCallback() {
                                 @Override
-                                public void onSuccess() {
+                                public void onSuccess(Object object) {
                                 }
 
                                 @Override
-                                public void onFailure() {
+                                public void onFailure(Object object) {
                                 }
                             });
                     refreshMainActivity();
@@ -302,22 +303,48 @@ public class MainActivity extends AppCompatActivity
                 navigationHeaderImageView.setImageResource(R.mipmap.ic_account);
 
                 // set isOnline true and update user's location
-                Map<String, Object> user = new HashMap<>();
-                user.put("online", true);
+                Map<String, Object> hashMap = new HashMap<>();
+                hashMap.put("online", true);
                 firestoreDbUtility.update(AppConstants.Collections.USERS,
-                        firebaseUser.getUid(), user, new FirestoreDbOperationCallback() {
+                        firebaseUser.getUid(), hashMap, new FirestoreDbOperationCallback() {
                             @Override
-                            public void onSuccess() {
+                            public void onSuccess(Object object) {
                             }
 
                             @Override
-                            public void onFailure() {
+                            public void onFailure(Object object) {
                             }
                         });
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume called");
+        FirebaseUser firebaseUser = singleton.getFirebaseUser();
+        if (firebaseUser != null) {
+            Location location = singleton.getCurrentLocation();
+            if (location != null) {
+                Map<String, Object> hashMap = new HashMap<>();
+                hashMap.put("location", new GeoPoint(location.getLatitude(), location.getLongitude()));
+                firestoreDbUtility.update(AppConstants.Collections.USERS, firebaseUser.getUid(),
+                        hashMap, new FirestoreDbOperationCallback() {
+
+                            @Override
+                            public void onSuccess(Object object) {
+                            }
+
+                            @Override
+                            public void onFailure(Object object) {
+                            }
+                        });
+            }
+        }
+        // todo: show fellow travellers on map
     }
 
     private void showMessage(String message) {
