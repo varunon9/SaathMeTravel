@@ -35,7 +35,7 @@
                                     <map>
                                       <entry key="outputName" value="ic_account" />
                                       <entry key="theme" value="CUSTOM" />
-                                      <entry key="themeColor" value="00574b" />
+                                      <entry key="themeColor" value="d81b60" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -119,6 +119,11 @@
                                 </PersistentState>
                               </value>
                             </entry>
+                          </map>
+                        </option>
+                        <option name="values">
+                          <map>
+                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>

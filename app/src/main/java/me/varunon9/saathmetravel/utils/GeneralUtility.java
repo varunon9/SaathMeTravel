@@ -2,6 +2,7 @@ package me.varunon9.saathmetravel.utils;
 
 import android.location.Location;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -66,6 +67,7 @@ public class GeneralUtility {
     public void showTravellersOnMap(GoogleMap googleMap, QuerySnapshot querySnapshot) {
         if (googleMap != null) {
             googleMap.clear();
+            LatLng latLng = null;
             for (DocumentSnapshot documentSnapshot: querySnapshot.getDocuments()) {
                 try {
                     GeoPoint geoPoint = (GeoPoint) documentSnapshot.getData().get("location");
@@ -83,19 +85,23 @@ public class GeneralUtility {
                             user.setMobile(documentSnapshot.getData().get("mobile").toString());
                         }
 
-                        LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+                        latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
                         Marker marker = googleMap.addMarker(
                                 new MarkerOptions()
                                 .position(latLng)
                                 .title(user.getName())
                                 .snippet(user.getEmail())
-                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_account))
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_account))
                         );
                         marker.setTag(user);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+            // animate for last location
+            if (latLng != null) {
+                googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
             }
         }
     }
