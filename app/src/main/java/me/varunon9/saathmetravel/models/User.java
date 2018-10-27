@@ -26,7 +26,7 @@ public class User {
     Date createdAt;
 
     public User() {
-        preference = AppConstants.userDefaultPreference;
+        preference = AppConstants.USER_DEFAULT_PREFERENCE;
         gender = AppConstants.Gender.MALE;
         createdAt = new Date();
         lastSeen = new Date();

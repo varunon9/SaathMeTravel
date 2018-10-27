@@ -35,6 +35,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -326,8 +327,8 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         Log.d(TAG, "onResume called");
         FirebaseUser firebaseUser = singleton.getFirebaseUser();
+        Location location = singleton.getCurrentLocation();
         if (firebaseUser != null) {
-            Location location = singleton.getCurrentLocation();
             if (location != null) {
                 Map<String, Object> hashMap = new HashMap<>();
                 hashMap.put("location", new GeoPoint(location.getLatitude(), location.getLongitude()));
@@ -344,7 +345,27 @@ public class MainActivity extends AppCompatActivity
                         });
             }
         }
-        // todo: show fellow travellers on map
+        if (singleton.getSourcePlace() != null && singleton.getDestinationPlace() != null) {
+            // todo: show fellow travellers on map covering same journey
+        } else {
+            // todo: show nearby travellers on map
+            int range = AppConstants.DEFAULT_RANGE;
+            GeoPoint lesserGeoPoint = generalUtility.getLesserGeoPoint(location, range);
+            GeoPoint greaterGeoPoint = generalUtility.getGreaterGeoPoint(location, range);
+            firestoreDbUtility.getNearbyTravellers(lesserGeoPoint,
+                    greaterGeoPoint, new FirestoreDbOperationCallback() {
+                        @Override
+                        public void onSuccess(Object object) {
+                            QuerySnapshot querySnapshot = (QuerySnapshot) object;
+                            generalUtility.showTravellersOnMap(mMap, querySnapshot);
+                        }
+
+                        @Override
+                        public void onFailure(Object object) {
+                            showMessage("Failed to locate nearby travellers.");
+                        }
+                    });
+        }
     }
 
     private void showMessage(String message) {

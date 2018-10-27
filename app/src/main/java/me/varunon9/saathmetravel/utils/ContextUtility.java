@@ -4,9 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -60,7 +58,7 @@ public class ContextUtility {
     public void showLocationOnMap(GoogleMap googleMap, Location location,
                                   String marker, boolean moveCamera, float zoomLevel) {
         // default location: Bangalore
-        LatLng currentLocation = new LatLng(12.97, 77.6);
+        LatLng currentLocation = AppConstants.DEFAULT_LAT_LNG;
 
         if (location != null) {
             currentLocation = new LatLng(location.getLatitude(),
@@ -98,9 +96,9 @@ public class ContextUtility {
     public void shareApp() {
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        String shareBody = AppConstants.shareAppBody;
+        String shareBody = AppConstants.SHARE_APP_BODY;
         sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
-                AppConstants.shareAppSubject);
+                AppConstants.SHARE_APP_SUBJECT);
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
         context.startActivity(Intent.createChooser(sharingIntent, "Share via"));
     }

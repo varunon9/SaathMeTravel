@@ -7,9 +7,13 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.Map;
+
+import me.varunon9.saathmetravel.constants.AppConstants;
 
 public class FirestoreDbUtility {
 
@@ -94,8 +98,23 @@ public class FirestoreDbUtility {
     }
 
     // this is not generalized
-    //public void getFellowTravellers()
-        // https://stackoverflow.com/questions/46630507/how-to-run-a-geo-nearby-query-with-firestore
-    // https://firebase.google.com/docs/firestore/query-data/queries
-    // https://firebase.google.com/docs/firestore/query-data/get-data
+    public void getNearbyTravellers(GeoPoint lesserGeoPoint, GeoPoint greaterGeoPoint,
+                                    final FirestoreDbOperationCallback callback) {
+        db.collection(AppConstants.Collections.USERS)
+                .whereGreaterThan("location", lesserGeoPoint)
+                .whereLessThan("location", greaterGeoPoint)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot querySnapshot) {
+                        callback.onSuccess(querySnapshot);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onFailure(null);
+                    }
+                });
+    }
 }
