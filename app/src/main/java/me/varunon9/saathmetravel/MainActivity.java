@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -37,6 +38,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +49,8 @@ import me.varunon9.saathmetravel.models.User;
 import me.varunon9.saathmetravel.utils.ContextUtility;
 import me.varunon9.saathmetravel.utils.FirestoreDbOperationCallback;
 import me.varunon9.saathmetravel.utils.FirestoreDbUtility;
+import me.varunon9.saathmetravel.utils.FirestoreQuery;
+import me.varunon9.saathmetravel.utils.FirestoreQueryConditionCode;
 import me.varunon9.saathmetravel.utils.GeneralUtility;
 
 public class MainActivity extends AppCompatActivity
@@ -346,26 +350,45 @@ public class MainActivity extends AppCompatActivity
             }
         }
         if (singleton.getSourcePlace() != null && singleton.getDestinationPlace() != null) {
-            // todo: show fellow travellers on map covering same journey
+            showFellowTravellersOnMap(singleton.getSourcePlace(), singleton.getDestinationPlace());
         } else {
-            // todo: show nearby travellers on map
-            int range = AppConstants.DEFAULT_RANGE;
-            GeoPoint lesserGeoPoint = generalUtility.getLesserGeoPoint(location, range);
-            GeoPoint greaterGeoPoint = generalUtility.getGreaterGeoPoint(location, range);
-            firestoreDbUtility.getNearbyTravellers(lesserGeoPoint,
-                    greaterGeoPoint, new FirestoreDbOperationCallback() {
-                        @Override
-                        public void onSuccess(Object object) {
-                            QuerySnapshot querySnapshot = (QuerySnapshot) object;
-                            generalUtility.showTravellersOnMap(mMap, querySnapshot);
-                        }
-
-                        @Override
-                        public void onFailure(Object object) {
-                            showMessage("Failed to locate nearby travellers.");
-                        }
-                    });
+            showNearbyTravellersOnMap(location);
         }
+    }
+
+    private void showNearbyTravellersOnMap(Location location) {
+        int range = AppConstants.DEFAULT_RANGE;
+        GeoPoint lesserGeoPoint = generalUtility.getLesserGeoPoint(location, range);
+        GeoPoint greaterGeoPoint = generalUtility.getGreaterGeoPoint(location, range);
+
+        List<FirestoreQuery> firestoreQueryList = new ArrayList<>();
+        firestoreQueryList.add(new FirestoreQuery(
+                FirestoreQueryConditionCode.WHERE_LESS_THAN,
+                "location",
+                greaterGeoPoint
+        ));
+        firestoreQueryList.add(new FirestoreQuery(
+                FirestoreQueryConditionCode.WHERE_GREATER_THAN,
+                "location",
+                lesserGeoPoint
+        ));
+        firestoreDbUtility.getMany(AppConstants.Collections.USERS,
+                firestoreQueryList, new FirestoreDbOperationCallback() {
+                    @Override
+                    public void onSuccess(Object object) {
+                        QuerySnapshot querySnapshot = (QuerySnapshot) object;
+                        generalUtility.showTravellersOnMap(mMap, querySnapshot);
+                    }
+
+                    @Override
+                    public void onFailure(Object object) {
+                        showMessage("Failed to locate nearby travellers.");
+                    }
+                });
+    }
+
+    // todo: show fellow travellers on map covering similar journey
+    private void showFellowTravellersOnMap(Place sourcePlace, Place destinationPlace) {
     }
 
     private void showMessage(String message) {

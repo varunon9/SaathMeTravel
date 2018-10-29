@@ -39,6 +39,7 @@ public final class AppConstants {
         private Collections() {}
 
         public static final String USERS = "users";
+        public static final String SEARCH_HISTORIES = "searchHistories";
     }
 
     // default/fallback location would be Bangalore

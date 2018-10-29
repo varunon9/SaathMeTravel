@@ -72,18 +72,7 @@ public class GeneralUtility {
                 try {
                     GeoPoint geoPoint = (GeoPoint) documentSnapshot.getData().get("location");
                     if (geoPoint != null) {
-                        User user = new User();
-                        user.setUid(documentSnapshot.getData().get("uid").toString());
-
-                        if (documentSnapshot.getData().get("email") != null) {
-                            user.setEmail(documentSnapshot.getData().get("email").toString());
-                        }
-                        if (documentSnapshot.getData().get("name") != null) {
-                            user.setName(documentSnapshot.getData().get("name").toString());
-                        }
-                        if (documentSnapshot.getData().get("mobile") != null) {
-                            user.setMobile(documentSnapshot.getData().get("mobile").toString());
-                        }
+                        User user = documentSnapshot.toObject(User.class);
 
                         latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
                         Marker marker = googleMap.addMarker(

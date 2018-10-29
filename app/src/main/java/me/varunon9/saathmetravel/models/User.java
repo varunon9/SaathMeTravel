@@ -19,17 +19,16 @@ public class User {
     private boolean isOnline; // actual field created will be online
     private String photoUrl;
 
-    private @ServerTimestamp
-    Date lastSeen;
-
-    private @ServerTimestamp
-    Date createdAt;
+    private @ServerTimestamp Date lastSeen;
+    private @ServerTimestamp Date createdAt;
+    private @ServerTimestamp Date updatedAt;
 
     public User() {
         preference = AppConstants.USER_DEFAULT_PREFERENCE;
         gender = AppConstants.Gender.MALE;
         createdAt = new Date();
         lastSeen = new Date();
+        updatedAt = new Date();
         isOnline = true;
     }
 
@@ -119,5 +118,13 @@ public class User {
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
