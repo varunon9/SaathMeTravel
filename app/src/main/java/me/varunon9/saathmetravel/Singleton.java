@@ -12,6 +12,8 @@ import com.google.android.gms.location.places.Place;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import me.varunon9.saathmetravel.constants.AppConstants;
+
 /**
  * This class contains global variables
  */
@@ -96,7 +98,11 @@ public class Singleton {
     }
 
     public int getFilterRange() {
-        return filterRange;
+        if (filterRange != 0) {
+            return filterRange;
+        } else {
+            return AppConstants.DEFAULT_RANGE;
+        }
     }
 
     public void setFilterRange(int filterRange) {

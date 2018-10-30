@@ -44,6 +44,6 @@ public final class AppConstants {
 
     // default/fallback location would be Bangalore
     public static final LatLng DEFAULT_LAT_LNG = new LatLng(12.97, 77.6);
-    public static final int DEFAULT_RANGE = 20; // 20 KM
+    public static final int DEFAULT_RANGE = 50; // 50 KM
 
 }

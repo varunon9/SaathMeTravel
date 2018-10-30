@@ -21,4 +21,7 @@
         Select range
     </string>
     <string name="search_travellers">Search Travellers</string>
+    <string name="your_last_24_hours_search_history">
+        Your last 24 hours search history
+    </string>
 </resources>

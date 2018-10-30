@@ -98,18 +98,10 @@
                 <RadioButton
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/range5RadioButton"
-                    android:layout_weight="1"
-                    android:checked="true"
-                    android:text="within 5 KM"
-                    android:onClick="onRangeRadioButtonClicked" />
-
-                <RadioButton
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:id="@+id/range10RadioButton"
                     android:layout_weight="1"
                     android:text="within 10 KM"
+                    android:textSize="@dimen/info_text_size"
                     android:onClick="onRangeRadioButtonClicked" />
 
                 <RadioButton
@@ -118,6 +110,17 @@
                     android:id="@+id/range20RadioButton"
                     android:layout_weight="1"
                     android:text="within 20 KM"
+                    android:textSize="@dimen/info_text_size"
+                    android:onClick="onRangeRadioButtonClicked" />
+
+                <RadioButton
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/range50RadioButton"
+                    android:layout_weight="1"
+                    android:text="within 50 KM"
+                    android:textSize="@dimen/info_text_size"
+                    android:checked="true"
                     android:onClick="onRangeRadioButtonClicked" />
 
             </RadioGroup>
@@ -132,12 +135,20 @@
             android:text="@string/search_travellers"
             android:onClick="onSearchTravellersButtonClicked"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimary"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:textSize="@dimen/info_text_size"
+            android:visibility="invisible"
+            android:text="@string/your_last_24_hours_search_history"
+            android:id="@+id/searchHistoryListInfoTextView" />
+
         <ListView
             android:id="@+id/searchHistoryListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:background="@drawable/shadow_border" />
 
     </LinearLayout>

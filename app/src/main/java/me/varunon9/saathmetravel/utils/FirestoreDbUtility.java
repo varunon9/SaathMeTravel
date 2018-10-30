@@ -51,6 +51,7 @@ public class FirestoreDbUtility {
                                     + collectionName
                                     + " "
                                     + documentName);
+                            e.printStackTrace();
                             callback.onFailure(null);
                         }
                     });
@@ -89,6 +90,7 @@ public class FirestoreDbUtility {
                                     + collectionName
                                     + " "
                                     + documentName);
+                            e.printStackTrace();
                             callback.onFailure(null);
                         }
                     });
@@ -112,6 +114,7 @@ public class FirestoreDbUtility {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             callback.onFailure(null);
+                            e.printStackTrace();
                         }
                     });
         } catch (Exception e) {
@@ -223,6 +226,7 @@ public class FirestoreDbUtility {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             callback.onFailure(null);
+                            e.printStackTrace();
                         }
                     });
         } catch (Exception e) {

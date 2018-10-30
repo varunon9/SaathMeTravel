@@ -42,22 +42,30 @@ public class GeneralUtility {
      * Latitude: 1 deg = 110.574 KM
      * Longitude: 1 deg = 111.320*cos(latitude) KM
      */
-    public GeoPoint getLesserGeoPoint(Location location, int range) {
+    public GeoPoint getLesserGeoPointFromLocation(Location location, int range) {
         LatLng latLng = AppConstants.DEFAULT_LAT_LNG;
         if (location != null) {
             latLng = new LatLng(location.getLatitude(), location.getLongitude());
         }
+        return getLesserGeoPointFromLatLng(latLng, range);
+    }
+
+    public GeoPoint getGreaterGeoPointFromLocation(Location location, int range) {
+        LatLng latLng = AppConstants.DEFAULT_LAT_LNG;
+        if (location != null) {
+            latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        }
+        return getGreaterGeoPointFromLatLng(latLng, range);
+    }
+
+    public GeoPoint getLesserGeoPointFromLatLng(LatLng latLng, int range) {
         double lowerLatitude = latLng.latitude - (range * (1 / 110.574));
         double lowerLongitude = latLng.longitude - (range * (1 / 111.320));
         GeoPoint lesserGeoPoint = new GeoPoint(lowerLatitude, lowerLongitude);
         return lesserGeoPoint;
     }
 
-    public GeoPoint getGreaterGeoPoint(Location location, int range) {
-        LatLng latLng = AppConstants.DEFAULT_LAT_LNG;
-        if (location != null) {
-            latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        }
+    public GeoPoint getGreaterGeoPointFromLatLng(LatLng latLng, int range) {
         double greaterLatitude = latLng.latitude + (range * (1 / 110.574));
         double greaterLongitude = latLng.longitude + (range * (1 / 111.320));
         GeoPoint greaterGeoPoint = new GeoPoint(greaterLatitude, greaterLongitude);
@@ -90,8 +98,44 @@ public class GeneralUtility {
             }
             // animate for last location
             if (latLng != null) {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
             }
         }
+    }
+
+    public void showSingleTravellerOnMap(FirestoreDbUtility firestoreDbUtility,
+                                         final GoogleMap googleMap, String userUid) {
+
+        firestoreDbUtility.getOne(AppConstants.Collections.USERS, userUid,
+                new FirestoreDbOperationCallback() {
+
+            @Override
+            public void onSuccess(Object object) {
+                DocumentSnapshot documentSnapshot = (DocumentSnapshot) object;
+                GeoPoint geoPoint = (GeoPoint) documentSnapshot.getData().get("location");
+                if (geoPoint != null) {
+                    User user = documentSnapshot.toObject(User.class);
+                    LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+                    Marker marker = googleMap.addMarker(
+                            new MarkerOptions()
+                                    .position(latLng)
+                                    .title(user.getName())
+                                    .snippet(user.getEmail())
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_account))
+                    );
+                    marker.setTag(user);
+                }
+            }
+
+            @Override
+            public void onFailure(Object object) {
+            }
+        });
+    }
+
+    // unique firestore collections document id
+    public String getUniqueDocumentId(String uid) {
+        String id = uid + "_" + System.currentTimeMillis();
+        return id;
     }
 }

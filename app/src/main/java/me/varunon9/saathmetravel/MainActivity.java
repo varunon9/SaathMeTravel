@@ -26,23 +26,26 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import me.varunon9.saathmetravel.constants.AppConstants;
 import me.varunon9.saathmetravel.models.User;
@@ -350,7 +353,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
         if (singleton.getSourcePlace() != null && singleton.getDestinationPlace() != null) {
-            showFellowTravellersOnMap(singleton.getSourcePlace(), singleton.getDestinationPlace());
+            showFellowTravellersOnMap(singleton);
         } else {
             showNearbyTravellersOnMap(location);
         }
@@ -358,8 +361,8 @@ public class MainActivity extends AppCompatActivity
 
     private void showNearbyTravellersOnMap(Location location) {
         int range = AppConstants.DEFAULT_RANGE;
-        GeoPoint lesserGeoPoint = generalUtility.getLesserGeoPoint(location, range);
-        GeoPoint greaterGeoPoint = generalUtility.getGreaterGeoPoint(location, range);
+        GeoPoint lesserGeoPoint = generalUtility.getLesserGeoPointFromLocation(location, range);
+        GeoPoint greaterGeoPoint = generalUtility.getGreaterGeoPointFromLocation(location, range);
 
         List<FirestoreQuery> firestoreQueryList = new ArrayList<>();
         firestoreQueryList.add(new FirestoreQuery(
@@ -387,8 +390,70 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    // todo: show fellow travellers on map covering similar journey
-    private void showFellowTravellersOnMap(Place sourcePlace, Place destinationPlace) {
+    private void showFellowTravellersOnMap(Singleton singleton) {
+        LatLng sourceLatLng = singleton.getSourcePlace().getLatLng();
+        LatLng destinationLatLng = singleton.getDestinationPlace().getLatLng();
+        int filterRange = singleton.getFilterRange();
+
+        GeoPoint sourceLocationLesserGeoPoint =
+                generalUtility.getLesserGeoPointFromLatLng(sourceLatLng, filterRange);
+        GeoPoint sourceLocationGreaterGeoPoint =
+                generalUtility.getGreaterGeoPointFromLatLng(sourceLatLng, filterRange);
+        GeoPoint destinationLocationLesserGeoPoint =
+                generalUtility.getLesserGeoPointFromLatLng(destinationLatLng, filterRange);
+        GeoPoint destinationLocationGreaterGeoPoint =
+                generalUtility.getGreaterGeoPointFromLatLng(destinationLatLng, filterRange);
+
+        List<FirestoreQuery> firestoreQueryList = new ArrayList<>();
+        firestoreQueryList.add(new FirestoreQuery(
+                FirestoreQueryConditionCode.WHERE_LESS_THAN,
+                "sourceLocation",
+                sourceLocationGreaterGeoPoint
+        ));
+        firestoreQueryList.add(new FirestoreQuery(
+                FirestoreQueryConditionCode.WHERE_GREATER_THAN,
+                "sourceLocation",
+                sourceLocationLesserGeoPoint
+        ));
+        // todo: use destinationFilter as well
+        /*firestoreQueryList.add(new FirestoreQuery(
+                FirestoreQueryConditionCode.WHERE_LESS_THAN,
+                "destinationLocation",
+                destinationLocationGreaterGeoPoint
+        ));
+        firestoreQueryList.add(new FirestoreQuery(
+                FirestoreQueryConditionCode.WHERE_GREATER_THAN,
+                "destinationLocation",
+                destinationLocationLesserGeoPoint
+        ));*/
+
+        firestoreDbUtility.getMany(AppConstants.Collections.SEARCH_HISTORIES,
+                firestoreQueryList, new FirestoreDbOperationCallback() {
+                    @Override
+                    public void onSuccess(Object object) {
+                        QuerySnapshot querySnapshot = (QuerySnapshot) object;
+                        Set<String> userUidSet = new HashSet<>();
+                        for (DocumentSnapshot documentSnapshot: querySnapshot) {
+                            userUidSet.add(documentSnapshot.getData().get("userUid").toString());
+                        }
+                        if (userUidSet.isEmpty()) {
+                            showMessage("No Fellow travellers found. Plan different travel");
+                        } else {
+                            if (mMap != null) {
+                                mMap.clear();
+                                for (String userUid: userUidSet) {
+                                    generalUtility.showSingleTravellerOnMap(firestoreDbUtility,
+                                            mMap, userUid);
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Object object) {
+                        showMessage("Failed to locate fellow travellers.");
+                    }
+                });
     }
 
     private void showMessage(String message) {

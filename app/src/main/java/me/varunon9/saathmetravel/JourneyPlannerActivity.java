@@ -1,6 +1,7 @@
 package me.varunon9.saathmetravel;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -11,13 +12,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -32,6 +36,7 @@ import me.varunon9.saathmetravel.utils.FirestoreDbOperationCallback;
 import me.varunon9.saathmetravel.utils.FirestoreDbUtility;
 import me.varunon9.saathmetravel.utils.FirestoreQuery;
 import me.varunon9.saathmetravel.utils.FirestoreQueryConditionCode;
+import me.varunon9.saathmetravel.utils.GeneralUtility;
 
 import static com.google.android.gms.location.places.AutocompleteFilter.TYPE_FILTER_ADDRESS;
 
@@ -41,6 +46,7 @@ public class JourneyPlannerActivity extends AppCompatActivity {
     private Singleton singleton;
     private ProgressDialog progressDialog;
     private FirestoreDbUtility firestoreDbUtility;
+    private GeneralUtility generalUtility;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +58,7 @@ public class JourneyPlannerActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         singleton = Singleton.getInstance(getApplicationContext());
         firestoreDbUtility = new FirestoreDbUtility();
+        generalUtility = new GeneralUtility();
 
         PlaceAutocompleteFragment sourceAutocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.source_autocomplete_fragment);
@@ -108,8 +115,10 @@ public class JourneyPlannerActivity extends AppCompatActivity {
             }
         });
 
-        // populating history listView
-        populateSearchHistoryListView();
+        // populating history listView if loggedin
+        if (singleton.getFirebaseUser() != null) {
+            populateSearchHistoryListView(singleton);
+        }
     }
 
     @Override
@@ -143,12 +152,6 @@ public class JourneyPlannerActivity extends AppCompatActivity {
         boolean checked = ((RadioButton) view).isChecked();
 
         switch(view.getId()) {
-            case R.id.range5RadioButton: {
-                if (checked) {
-                    singleton.setFilterRange(5);
-                }
-                break;
-            }
             case R.id.range10RadioButton: {
                 if (checked) {
                     singleton.setFilterRange(10);
@@ -161,21 +164,30 @@ public class JourneyPlannerActivity extends AppCompatActivity {
                 }
                 break;
             }
+            case R.id.range50RadioButton: {
+                if (checked) {
+                    singleton.setFilterRange(50);
+                }
+                break;
+            }
         }
     }
 
     public void onSearchTravellersButtonClicked(View view) {
         Place sourcePlace = singleton.getSourcePlace();
         Place destinationPlace = singleton.getDestinationPlace();
-        int range = singleton.getFilterRange();
 
         if (sourcePlace == null || destinationPlace == null) {
             showMessage("Please enter source as well as destination");
             return;
         }
-        // todo: save search to searchHistory
-        // todo: get fellow travellers data and pass to MainActivity via Bundle
-        // todo: show user `No Travellers Found` message
+        if (singleton.getFirebaseUser() != null) {
+            saveSearchHistory(sourcePlace, destinationPlace, singleton);
+        }
+
+        // go to MainActivity
+        Intent intent = new Intent(JourneyPlannerActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 
     private void setSelectedSourceAndDestinationPlace(
@@ -202,7 +214,7 @@ public class JourneyPlannerActivity extends AppCompatActivity {
         }
     }
 
-    private void populateSearchHistoryListView() {
+    private void populateSearchHistoryListView(Singleton singleton) {
         final ListView searchHistoryListView = findViewById(R.id.searchHistoryListView);
         final List<SearchHistory> searchHistoryList = new ArrayList<>();
 
@@ -219,6 +231,11 @@ public class JourneyPlannerActivity extends AppCompatActivity {
                 "createdAt",
                 yesterdaysDate
         ));
+        firestoreQueryList.add(new FirestoreQuery(
+                FirestoreQueryConditionCode.WHERE_EQUAL_TO,
+                "userUid",
+                singleton.getFirebaseUser().getUid()
+        ));
 
         firestoreDbUtility.getMany(AppConstants.Collections.SEARCH_HISTORIES,
                 firestoreQueryList, new FirestoreDbOperationCallback() {
@@ -234,6 +251,15 @@ public class JourneyPlannerActivity extends AppCompatActivity {
                                     R.layout.search_history_list_item,
                                     searchHistoryList)
                             );
+
+                            // hide last 24 hours info text when there is no history
+                            TextView searchHistoryListInfoTextView =
+                                    (TextView) findViewById(R.id.searchHistoryListInfoTextView);
+                            if (searchHistoryList.isEmpty()) {
+                                searchHistoryListInfoTextView.setVisibility(View.INVISIBLE);
+                            } else {
+                                searchHistoryListInfoTextView.setVisibility(View.VISIBLE);
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -245,5 +271,37 @@ public class JourneyPlannerActivity extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    private void saveSearchHistory(Place sourcePlace, Place destinationPlace, Singleton singleton) {
+        SearchHistory searchHistory = new SearchHistory();
+        searchHistory.setSourceAddress(sourcePlace.getAddress().toString());
+        searchHistory.setDestinationAddress(destinationPlace.getAddress().toString());
+
+        FirebaseUser firebaseUser = singleton.getFirebaseUser();
+        searchHistory.setUserUid(firebaseUser.getUid());
+
+        GeoPoint sourceLocation = new GeoPoint(sourcePlace.getLatLng().latitude,
+                sourcePlace.getLatLng().longitude);
+        GeoPoint destinationLocation = new GeoPoint(destinationPlace.getLatLng().latitude,
+                destinationPlace.getLatLng().longitude);
+        searchHistory.setSourceLocation(sourceLocation);
+        searchHistory.setDestinationLocation(destinationLocation);
+
+        final String id = generalUtility.getUniqueDocumentId(firebaseUser.getUid());
+        searchHistory.setId(id);
+
+        firestoreDbUtility.createOrMerge(AppConstants.Collections.SEARCH_HISTORIES,
+                id, searchHistory, new FirestoreDbOperationCallback() {
+                    @Override
+                    public void onSuccess(Object object) {
+                        Log.d(TAG, "Search history saved " + id);
+                    }
+
+                    @Override
+                    public void onFailure(Object object) {
+                        Log.e(TAG, "Failed to save search history " + id);
+                    }
+                });
     }
 }
