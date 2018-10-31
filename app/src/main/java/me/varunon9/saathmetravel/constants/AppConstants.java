@@ -40,6 +40,7 @@ public final class AppConstants {
 
         public static final String USERS = "users";
         public static final String SEARCH_HISTORIES = "searchHistories";
+        public static final String CHATS = "chats";
     }
 
     // default/fallback location would be Bangalore
@@ -47,6 +48,8 @@ public final class AppConstants {
     public static final int DEFAULT_RANGE = 50; // 50 KM
 
     public static final String NAVIGATION_ITEM = "navigationItem";
+    public static final String USER_UID = "userUid";
+    public static final String TRAVELLER_USER_UID = "travellerUserUid";
     public static class ChatFragmentActivityTitle {
         private ChatFragmentActivityTitle() {}
 
@@ -54,4 +57,6 @@ public final class AppConstants {
         public static final String Chats = "Chats";
     }
 
+    public static final long LOCATION_REFRESH_TIME = 60 * 1000; // 60 secs
+    public static float LOCATION_REFRESH_DISTANCE = 100; // 10 meters
 }

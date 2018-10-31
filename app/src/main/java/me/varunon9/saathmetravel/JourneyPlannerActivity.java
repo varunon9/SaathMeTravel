@@ -29,7 +29,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import me.varunon9.saathmetravel.arrayAdapters.SearchHistoryArrayAdapter;
+import me.varunon9.saathmetravel.adapters.SearchHistoryArrayAdapter;
 import me.varunon9.saathmetravel.constants.AppConstants;
 import me.varunon9.saathmetravel.models.SearchHistory;
 import me.varunon9.saathmetravel.utils.FirestoreDbOperationCallback;
@@ -187,6 +187,9 @@ public class JourneyPlannerActivity extends AppCompatActivity {
 
         // go to MainActivity
         Intent intent = new Intent(JourneyPlannerActivity.this, MainActivity.class);
+
+        // clear history stack so that back button does no lead to JourneyPlannerActivity
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 

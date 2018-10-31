@@ -74,7 +74,7 @@ public class GeneralUtility {
 
     public void showTravellersOnMap(GoogleMap googleMap, QuerySnapshot querySnapshot) {
         if (googleMap != null) {
-            googleMap.clear();
+            //googleMap.clear();
             LatLng latLng = null;
             for (DocumentSnapshot documentSnapshot: querySnapshot.getDocuments()) {
                 try {

@@ -13,11 +13,17 @@ import android.view.View;
 
 import me.varunon9.saathmetravel.constants.AppConstants;
 import me.varunon9.saathmetravel.ui.chat.ChatFragment;
+import me.varunon9.saathmetravel.ui.chat.ChatListFragment;
+import me.varunon9.saathmetravel.ui.chat.ProfileFragment;
+import me.varunon9.saathmetravel.utils.FirestoreDbUtility;
 
 public class ChatFragmentActivity extends AppCompatActivity {
 
     private String TAG = "ChatFragmentActivity";
     private ProgressDialog progressDialog;
+    public FirestoreDbUtility firestoreDbUtility;
+    public String userUid;
+    public String travellerUserUid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,16 +31,17 @@ public class ChatFragmentActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate called");
         setContentView(R.layout.chat_activity);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         // display back button in action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        firestoreDbUtility = new FirestoreDbUtility();
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             int navigationLink = bundle.getInt(AppConstants.NAVIGATION_ITEM);
+            userUid = bundle.getString(AppConstants.USER_UID);
+            travellerUserUid = bundle.getString(AppConstants.TRAVELLER_USER_UID);
             Fragment fragment = getSelectedFragment(navigationLink);
             if (fragment != null) {
                 getSupportFragmentManager().beginTransaction()
@@ -57,13 +64,16 @@ public class ChatFragmentActivity extends AppCompatActivity {
         String title = "";
         if (id == R.id.nav_profile) {
             title = AppConstants.ChatFragmentActivityTitle.PROFILE;
-            fragment = new ChatFragment(); // todo: change to profile
+            fragment = new ProfileFragment();
+        } else if (id == R.id.nav_chats) {
+            title = AppConstants.ChatFragmentActivityTitle.Chats;
+            fragment = new ChatListFragment();
         }
         updateActionBarTitle(title);
         return fragment;
     }
 
-    private void updateActionBarTitle(String title) {
+    public void updateActionBarTitle(String title) {
         if (title != null) {
             getSupportActionBar().setTitle(title);
         }
@@ -88,5 +98,12 @@ public class ChatFragmentActivity extends AppCompatActivity {
     public void showMessage(String message) {
         View parentLayout = findViewById(R.id.container);
         Snackbar.make(parentLayout, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    public void goToChatFragment() {
+        Fragment fragment = new ChatFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .commitNow();
     }
 }

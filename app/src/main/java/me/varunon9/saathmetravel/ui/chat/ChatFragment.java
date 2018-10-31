@@ -9,28 +9,36 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import me.varunon9.saathmetravel.ChatFragmentActivity;
 import me.varunon9.saathmetravel.R;
+import me.varunon9.saathmetravel.models.Chat;
 
 public class ChatFragment extends Fragment {
 
-    private ChatViewModel mViewModel;
-
-    public static ChatFragment newInstance() {
-        return new ChatFragment();
-    }
+    private ChatViewModel chatViewModel;
+    private ChatFragmentActivity chatFragmentActivity;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.chat_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.chat_fragment, container, false);
+        chatFragmentActivity = (ChatFragmentActivity) getActivity();
+        return rootView;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(ChatViewModel.class);
-        // TODO: Use the ViewModel
+        chatViewModel = ViewModelProviders.of(getActivity()).get(ChatViewModel.class);
+        chatViewModel.getSelectedChat().observe(this, chat -> {
+            setChatDetails(chat);
+        });
+    }
+
+    private void setChatDetails(Chat chat) {
+        chatFragmentActivity.updateActionBarTitle(chat.getRecipientName());
+        // todo: update UI
     }
 
 }

@@ -205,6 +205,21 @@ public class FirestoreDbUtility {
                         }
                         break;
                     }
+
+                    case FirestoreQueryConditionCode.WHERE_ARRAY_CONTAINS: {
+                        if (query == null) {
+                            query = collectionReference.whereArrayContains(
+                                    firestoreQuery.getField(),
+                                    firestoreQuery.getValue()
+                            );
+                        } else {
+                            query = query.whereArrayContains(
+                                    firestoreQuery.getField(),
+                                    firestoreQuery.getValue()
+                            );
+                        }
+                        break;
+                    }
                 }
             }
 

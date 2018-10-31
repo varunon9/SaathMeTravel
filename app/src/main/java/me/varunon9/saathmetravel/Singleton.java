@@ -3,7 +3,9 @@ package me.varunon9.saathmetravel;
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.android.volley.RequestQueue;
@@ -22,18 +24,51 @@ public class Singleton {
     private static Singleton singleton;
     private RequestQueue requestQueue;
     private Context context;
-    private LocationManager locationManager;
     private String TAG = "Singleton";
     private FirebaseUser firebaseUser;
     private boolean checkUserLogin = true;
     private Place sourcePlace;
     private Place destinationPlace;
     private int filterRange;
+    private Location location;
+    private LocationManager locationManager;
 
     private Singleton(Context context) {
         this.context = context;
         requestQueue = getRequestQueue();
         filterRange = 5; // 5 KM by default
+
+        setLiveLocationListener();
+    }
+
+    private void setLiveLocationListener() {
+        LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                setLocation(location);
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+            }
+        };
+        locationManager =
+                (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+        try {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    AppConstants.LOCATION_REFRESH_TIME, AppConstants.LOCATION_REFRESH_DISTANCE,
+                    locationListener);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
     }
 
     public static synchronized Singleton getInstance(Context context) {
@@ -51,13 +86,13 @@ public class Singleton {
     }
 
     public Location getCurrentLocation() {
-        if (locationManager == null) {
+        /*if (locationManager == null) {
             locationManager =
                     (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
         }
-        Criteria criteria = new Criteria();
         Location location = null;
         try {
+            Criteria criteria = new Criteria();
             location = locationManager.getLastKnownLocation(
                     locationManager.getBestProvider(criteria, false)
             );
@@ -66,7 +101,8 @@ public class Singleton {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return location;
+        return location;*/
+        return getLocation();
     }
 
     public FirebaseUser getFirebaseUser() {
@@ -107,5 +143,13 @@ public class Singleton {
 
     public void setFilterRange(int filterRange) {
         this.filterRange = filterRange;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

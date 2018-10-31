@@ -166,8 +166,14 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_logout) {
             firebaseLogout();
         } else if (id == R.id.nav_profile) {
-            // todo: go to profile
-            // todo: add Chats to drawer menu
+            Bundle args = new Bundle();
+            args.putInt(AppConstants.NAVIGATION_ITEM, id);
+            args.putString(AppConstants.TRAVELLER_USER_UID, singleton.getFirebaseUser().getUid());
+            goToChatFragmentActivity(args);
+        } else if (id == R.id.nav_chats) {
+            Bundle args = new Bundle();
+            args.putInt(AppConstants.NAVIGATION_ITEM, id);
+            goToChatFragmentActivity(args);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -256,9 +262,9 @@ public class MainActivity extends AppCompatActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, show user his current location
                     Location location = singleton.getCurrentLocation();
-                    mMap.clear(); // clear initial marker
+                    //mMap.clear(); // clear initial marker
                     contextUtility.showLocationOnMap(mMap, location, AppConstants.CURRENT_LOCATION_MARKER,
-                            true, 12);
+                            true, 10);
                 } else {
                     // permission denied, show user toast notification
                     Toast.makeText(this, AppConstants.ACCESS_LOCATION_TOAST_MESSAGE,
@@ -283,12 +289,14 @@ public class MainActivity extends AppCompatActivity
                     .findViewById(R.id.navigationHeaderSubTitleTextView);
 
             MenuItem profileMenuItem = navigationDrawerMenu.findItem(R.id.nav_profile);
+            MenuItem chatsMenuItem = navigationDrawerMenu.findItem(R.id.nav_chats);
             MenuItem loginMenuItem = navigationDrawerMenu.findItem(R.id.nav_login);
             MenuItem logoutMenuItem = navigationDrawerMenu.findItem(R.id.nav_logout);
 
             if (firebaseUser == null) {
                 // user is not logged in
                 profileMenuItem.setVisible(false);
+                chatsMenuItem.setVisible(false);
                 logoutMenuItem.setVisible(false);
             } else {
                 String displayName = firebaseUser.getDisplayName();
@@ -359,6 +367,14 @@ public class MainActivity extends AppCompatActivity
             showFellowTravellersOnMap(singleton);
         } else {
             showNearbyTravellersOnMap(location);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mMap != null) {
+            mMap.clear(); // clearing google map when leaving activity
         }
     }
 
@@ -443,7 +459,7 @@ public class MainActivity extends AppCompatActivity
                             showMessage("No Fellow travellers found. Plan different travel");
                         } else {
                             if (mMap != null) {
-                                mMap.clear();
+                                //mMap.clear();
                                 for (String userUid: userUidSet) {
                                     generalUtility.showSingleTravellerOnMap(firestoreDbUtility,
                                             mMap, userUid);
@@ -469,10 +485,15 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, marker.getTitle() + " clicked");
         try {
             User user = (User) marker.getTag();
-            if (singleton.getFirebaseUser() == null) {
-                showMessage("You need to login to chat with traveller");
-            } else {
-                // todo: go to chat Activity
+            if (user != null) {
+                if (singleton.getFirebaseUser() == null) {
+                    showMessage("You need to login to chat with traveller");
+                } else {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(AppConstants.TRAVELLER_USER_UID, user.getUid());
+                    bundle.putInt(AppConstants.NAVIGATION_ITEM, R.id.nav_profile);
+                    goToChatFragmentActivity(bundle);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -522,6 +543,13 @@ public class MainActivity extends AppCompatActivity
         Intent intent = getIntent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         finish();
+        startActivity(intent);
+    }
+
+    private void goToChatFragmentActivity(Bundle bundle) {
+        bundle.putString(AppConstants.USER_UID, singleton.getFirebaseUser().getUid());
+        Intent intent = new Intent(MainActivity.this, ChatFragmentActivity.class);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 }
