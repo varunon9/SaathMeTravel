@@ -81,24 +81,15 @@ public class GeneralUtility {
                     GeoPoint geoPoint = (GeoPoint) documentSnapshot.getData().get("location");
                     if (geoPoint != null) {
                         User user = documentSnapshot.toObject(User.class);
-
-                        latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
-                        Marker marker = googleMap.addMarker(
-                                new MarkerOptions()
-                                .position(latLng)
-                                .title(user.getName())
-                                .snippet(user.getEmail())
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_account))
-                        );
-                        marker.setTag(user);
+                        setTravellerMarkerOnMap(googleMap, geoPoint, user);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            // animate for last location
+            // animate for last location, zoom level = 10 (city)
             if (latLng != null) {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
             }
         }
     }
@@ -115,15 +106,7 @@ public class GeneralUtility {
                 GeoPoint geoPoint = (GeoPoint) documentSnapshot.getData().get("location");
                 if (geoPoint != null) {
                     User user = documentSnapshot.toObject(User.class);
-                    LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
-                    Marker marker = googleMap.addMarker(
-                            new MarkerOptions()
-                                    .position(latLng)
-                                    .title(user.getName())
-                                    .snippet(user.getEmail())
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_account))
-                    );
-                    marker.setTag(user);
+                    setTravellerMarkerOnMap(googleMap, geoPoint, user);
                 }
             }
 
@@ -137,5 +120,17 @@ public class GeneralUtility {
     public String getUniqueDocumentId(String uid) {
         String id = uid + "_" + System.currentTimeMillis();
         return id;
+    }
+
+    private void setTravellerMarkerOnMap(GoogleMap googleMap, GeoPoint geoPoint, User user) {
+        LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+        Marker marker = googleMap.addMarker(
+                new MarkerOptions()
+                        .position(latLng)
+                        .title(user.getName())
+                        .snippet(user.getEmail())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_account))
+        );
+        marker.setTag(user);
     }
 }

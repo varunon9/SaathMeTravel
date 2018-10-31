@@ -463,6 +463,17 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        Log.d(TAG, marker.getTitle() + " clicked");
+        try {
+            User user = (User) marker.getTag();
+            if (singleton.getFirebaseUser() == null) {
+                showMessage("You need to login to chat with traveller");
+            } else {
+                // todo: go to chat Activity
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
