@@ -46,4 +46,12 @@ public final class AppConstants {
     public static final LatLng DEFAULT_LAT_LNG = new LatLng(12.97, 77.6);
     public static final int DEFAULT_RANGE = 50; // 50 KM
 
+    public static final String NAVIGATION_ITEM = "navigationItem";
+    public static class ChatFragmentActivityTitle {
+        private ChatFragmentActivityTitle() {}
+
+        public static final String PROFILE = "Profile";
+        public static final String Chats = "Chats";
+    }
+
 }

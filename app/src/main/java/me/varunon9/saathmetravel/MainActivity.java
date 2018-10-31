@@ -165,10 +165,13 @@ public class MainActivity extends AppCompatActivity
             firebaseLogin();
         } else if (id == R.id.nav_logout) {
             firebaseLogout();
-        } else {
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
+        } else if (id == R.id.nav_profile) {
+            // todo: go to profile
+            // todo: add Chats to drawer menu
         }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+
         return true;
     }
 
