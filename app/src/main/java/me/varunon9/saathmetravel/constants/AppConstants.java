@@ -48,8 +48,9 @@ public final class AppConstants {
     public static final int DEFAULT_RANGE = 50; // 50 KM
 
     public static final String NAVIGATION_ITEM = "navigationItem";
-    public static final String USER_UID = "userUid";
-    public static final String TRAVELLER_USER_UID = "travellerUserUid";
+    public static final String CHAT_INITIATOR_UID = "chatInitiatorUid";
+    public static final String CHAT_RECIPIENT_UID = "chatRecipientUid";
+    public static final String CHAT_INITIATOR_NAME = "chatInitiatorName";
     public static class ChatFragmentActivityTitle {
         private ChatFragmentActivityTitle() {}
 

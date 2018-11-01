@@ -15,19 +15,22 @@ import android.widget.RadioGroup;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import me.varunon9.saathmetravel.ChatFragmentActivity;
 import me.varunon9.saathmetravel.R;
 import me.varunon9.saathmetravel.constants.AppConstants;
+import me.varunon9.saathmetravel.models.Chat;
 import me.varunon9.saathmetravel.models.User;
 import me.varunon9.saathmetravel.utils.FirestoreDbOperationCallback;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
-    private ProfileViewModel profileViewModel;
     private ChatFragmentActivity chatFragmentActivity;
+    private ChatViewModel chatViewModel;
     private EditText nameEditText;
     private EditText preferenceEditText;
     private Button updateProfileButton;
@@ -35,6 +38,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private RadioGroup genderRadioGroup;
     private RadioButton maleRadioButton;
     private RadioButton femaleRadioButton;
+    private User currentUser;
     private String TAG = "ProfileFragment";
 
     @Override
@@ -60,7 +64,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        profileViewModel = ViewModelProviders.of(getActivity()).get(ProfileViewModel.class);
+        chatViewModel = ViewModelProviders.of(this.getActivity()).get(ChatViewModel.class);
         getTravellerProfileFromFirestore();
     }
 
@@ -68,13 +72,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         chatFragmentActivity.showProgressDialog("Fetching Traveller info",
                 "Please wait", false);
         chatFragmentActivity.firestoreDbUtility.getOne(AppConstants.Collections.USERS,
-                chatFragmentActivity.travellerUserUid, new FirestoreDbOperationCallback() {
+                chatFragmentActivity.chatRecipientUid, new FirestoreDbOperationCallback() {
                     @Override
                     public void onSuccess(Object object) {
                         DocumentSnapshot documentSnapshot = (DocumentSnapshot) object;
-                        User user = documentSnapshot.toObject(User.class);
-                        profileViewModel.setSelectedTraveller(user);
-                        setProfileDetails(user);
+                        currentUser = documentSnapshot.toObject(User.class);
+                        setProfileDetails(currentUser);
                         chatFragmentActivity.dismissProgressDialog();
                     }
 
@@ -95,7 +98,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             femaleRadioButton.setChecked(true);
         }
 
-        if (!chatFragmentActivity.userUid.equals(chatFragmentActivity.travellerUserUid)) {
+        if (!chatFragmentActivity.chatInitiatorUid.equals(chatFragmentActivity.chatRecipientUid)) {
             updateProfileButton.setVisibility(View.INVISIBLE);
 
             // disabling form fields
@@ -111,7 +114,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         int id = view.getId();
         switch (id) {
             case R.id.updateProfileButton: {
-                if (chatFragmentActivity.userUid.equals(chatFragmentActivity.travellerUserUid)) {
+                if (chatFragmentActivity.chatInitiatorUid.equals(chatFragmentActivity.chatRecipientUid)) {
                     String name = nameEditText.getText().toString();
                     String preference = preferenceEditText.getText().toString();
                     String gender = AppConstants.Gender.MALE;
@@ -135,6 +138,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
 
             case R.id.chatWithTravellerButton: {
+                Chat chat = new Chat();
+                chat.setInitiatorUid(chatFragmentActivity.chatInitiatorUid);
+                chat.setInitiatorName(chatFragmentActivity.chatInitiatorName);
+                chat.setRecipientName(currentUser.getName());
+                chat.setRecipientUid(currentUser.getUid());
+
+                List<String> participants = new ArrayList<>();
+                participants.add(chatFragmentActivity.chatInitiatorUid);
+                participants.add(currentUser.getUid());
+                chat.setParticipantsUid(participants);
+
+                chatViewModel.setSelectedChat(chat);
+                chatFragmentActivity.goToChatFragment();
                 break;
             }
         }
@@ -145,7 +161,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         chatFragmentActivity.showProgressDialog("Updating profile",
                 "Please wait", false);
         chatFragmentActivity.firestoreDbUtility.update(AppConstants.Collections.USERS,
-                chatFragmentActivity.userUid,
+                chatFragmentActivity.chatInitiatorUid,
                 hashMap, new FirestoreDbOperationCallback() {
                     @Override
                     public void onSuccess(Object object) {

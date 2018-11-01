@@ -9,9 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+
 import me.varunon9.saathmetravel.ChatFragmentActivity;
 import me.varunon9.saathmetravel.R;
+import me.varunon9.saathmetravel.constants.AppConstants;
 import me.varunon9.saathmetravel.models.Chat;
+import me.varunon9.saathmetravel.models.User;
+import me.varunon9.saathmetravel.utils.FirestoreDbOperationCallback;
 
 public class ChatFragment extends Fragment {
 
@@ -32,13 +37,36 @@ public class ChatFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         chatViewModel = ViewModelProviders.of(getActivity()).get(ChatViewModel.class);
         chatViewModel.getSelectedChat().observe(this, chat -> {
-            setChatDetails(chat);
+            chatFragmentActivity.updateActionBarTitle(chat.getRecipientName());
+            getRecipientProfileFromFirestore(chat.getRecipientUid());
+            // todo: update messages
         });
     }
 
-    private void setChatDetails(Chat chat) {
-        chatFragmentActivity.updateActionBarTitle(chat.getRecipientName());
-        // todo: update UI
+    private void getRecipientProfileFromFirestore(String recipientUid) {
+        chatFragmentActivity.showProgressDialog("Fetching Recipient info",
+                "Please wait", false);
+        chatFragmentActivity.firestoreDbUtility.getOne(AppConstants.Collections.USERS,
+                recipientUid, new FirestoreDbOperationCallback() {
+                    @Override
+                    public void onSuccess(Object object) {
+                        DocumentSnapshot documentSnapshot = (DocumentSnapshot) object;
+                        User recipientUser = documentSnapshot.toObject(User.class);
+                        chatFragmentActivity.dismissProgressDialog();
+
+                        updateLastSeen(recipientUser);
+                    }
+
+                    @Override
+                    public void onFailure(Object object) {
+                        chatFragmentActivity.dismissProgressDialog();
+                        chatFragmentActivity.showMessage("Failed to fetch recipient info");
+                    }
+                });
+    }
+
+    private void updateLastSeen(User recipientUser) {
+        // todo: update last seen
     }
 
 }

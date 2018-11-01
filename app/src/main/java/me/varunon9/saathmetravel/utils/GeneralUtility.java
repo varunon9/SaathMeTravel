@@ -13,6 +13,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import me.varunon9.saathmetravel.R;
 import me.varunon9.saathmetravel.constants.AppConstants;
 import me.varunon9.saathmetravel.models.User;
@@ -132,5 +136,29 @@ public class GeneralUtility {
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_account))
         );
         marker.setTag(user);
+    }
+
+    private void silentlyUpdateUserProfile(FirestoreDbUtility firestoreDbUtility,
+                                          Map<String, Object> hashMap,String userUid) {
+        firestoreDbUtility.update(AppConstants.Collections.USERS,
+                userUid,
+                hashMap, new FirestoreDbOperationCallback() {
+                    @Override
+                    public void onSuccess(Object object) {
+                    }
+
+                    @Override
+                    public void onFailure(Object object) {
+                    }
+                });
+    }
+
+    public void setUserLastSeenStatus(FirestoreDbUtility firestoreDbUtility,
+                                      String userUid) {
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put("online", false);
+        hashMap.put("lastSeen", new Date());
+
+        silentlyUpdateUserProfile(firestoreDbUtility, hashMap, userUid);
     }
 }

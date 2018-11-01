@@ -4,10 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
@@ -22,8 +20,9 @@ public class ChatFragmentActivity extends AppCompatActivity {
     private String TAG = "ChatFragmentActivity";
     private ProgressDialog progressDialog;
     public FirestoreDbUtility firestoreDbUtility;
-    public String userUid;
-    public String travellerUserUid;
+    public String chatInitiatorUid;
+    public String chatRecipientUid;
+    public String chatInitiatorName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +39,9 @@ public class ChatFragmentActivity extends AppCompatActivity {
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             int navigationLink = bundle.getInt(AppConstants.NAVIGATION_ITEM);
-            userUid = bundle.getString(AppConstants.USER_UID);
-            travellerUserUid = bundle.getString(AppConstants.TRAVELLER_USER_UID);
+            chatInitiatorUid = bundle.getString(AppConstants.CHAT_INITIATOR_UID);
+            chatRecipientUid = bundle.getString(AppConstants.CHAT_RECIPIENT_UID);
+            chatInitiatorName = bundle.getString(AppConstants.CHAT_INITIATOR_NAME);
             Fragment fragment = getSelectedFragment(navigationLink);
             if (fragment != null) {
                 getSupportFragmentManager().beginTransaction()

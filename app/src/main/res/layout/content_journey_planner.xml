@@ -134,6 +134,7 @@
             android:textColor="@color/colorWhite"
             android:text="@string/search_travellers"
             android:drawableLeft="@drawable/ic_search_travellers"
+            android:padding="12dp"
             android:onClick="onSearchTravellersButtonClicked"/>
 
         <TextView

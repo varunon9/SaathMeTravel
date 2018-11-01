@@ -113,7 +113,11 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if (doubleBackToExitPressedOnce) {
-                // todo: set isOnline false, update lastSeen if user is loggedIn
+                // updating last seen and isOnline
+                if (singleton.getFirebaseUser() != null) {
+                    generalUtility.setUserLastSeenStatus(firestoreDbUtility,
+                            singleton.getFirebaseUser().getUid());
+                }
                 super.onBackPressed();
                 return;
             }
@@ -168,7 +172,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_profile) {
             Bundle args = new Bundle();
             args.putInt(AppConstants.NAVIGATION_ITEM, id);
-            args.putString(AppConstants.TRAVELLER_USER_UID, singleton.getFirebaseUser().getUid());
+            args.putString(AppConstants.CHAT_RECIPIENT_UID, singleton.getFirebaseUser().getUid());
             goToChatFragmentActivity(args);
         } else if (id == R.id.nav_chats) {
             Bundle args = new Bundle();
@@ -490,7 +494,7 @@ public class MainActivity extends AppCompatActivity
                     showMessage("You need to login to chat with traveller");
                 } else {
                     Bundle bundle = new Bundle();
-                    bundle.putString(AppConstants.TRAVELLER_USER_UID, user.getUid());
+                    bundle.putString(AppConstants.CHAT_RECIPIENT_UID, user.getUid());
                     bundle.putInt(AppConstants.NAVIGATION_ITEM, R.id.nav_profile);
                     goToChatFragmentActivity(bundle);
                 }
@@ -531,9 +535,11 @@ public class MainActivity extends AppCompatActivity
                 .signOut(this)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
-                        singleton.setFirebaseUser(null);
+                        // updating isOnline and lastSeen
+                        generalUtility.setUserLastSeenStatus(firestoreDbUtility,
+                                singleton.getFirebaseUser().getUid());
 
-                        // todo: update isOnline and lastSeen
+                        singleton.setFirebaseUser(null);
                         refreshMainActivity();
                     }
                 });
@@ -547,7 +553,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void goToChatFragmentActivity(Bundle bundle) {
-        bundle.putString(AppConstants.USER_UID, singleton.getFirebaseUser().getUid());
+        bundle.putString(AppConstants.CHAT_INITIATOR_UID, singleton.getFirebaseUser().getUid());
+        bundle.putString(AppConstants.CHAT_INITIATOR_NAME, singleton.getFirebaseUser().getDisplayName());
         Intent intent = new Intent(MainActivity.this, ChatFragmentActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);

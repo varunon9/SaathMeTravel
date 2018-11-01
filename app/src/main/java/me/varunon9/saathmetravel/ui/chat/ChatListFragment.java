@@ -65,7 +65,7 @@ public class ChatListFragment extends Fragment {
         firestoreQueryList.add(new FirestoreQuery(
                 FirestoreQueryConditionCode.WHERE_ARRAY_CONTAINS,
                 "participantsUid",
-                chatFragmentActivity.userUid
+                chatFragmentActivity.chatInitiatorUid
         ));
 
         chatFragmentActivity.firestoreDbUtility.getMany(AppConstants.Collections.CHATS,
