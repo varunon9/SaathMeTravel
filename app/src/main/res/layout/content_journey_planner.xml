@@ -133,6 +133,7 @@
             android:background="@color/colorPrimary"
             android:textColor="@color/colorWhite"
             android:text="@string/search_travellers"
+            android:drawableLeft="@drawable/ic_search_travellers"
             android:onClick="onSearchTravellersButtonClicked"/>
 
         <TextView
