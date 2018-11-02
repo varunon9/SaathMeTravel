@@ -14,18 +14,25 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import me.varunon9.saathmetravel.ChatFragmentActivity;
 import me.varunon9.saathmetravel.R;
+import me.varunon9.saathmetravel.adapters.ChatListRecyclerViewAdapter;
 import me.varunon9.saathmetravel.constants.AppConstants;
 import me.varunon9.saathmetravel.models.Chat;
+import me.varunon9.saathmetravel.models.Message;
 import me.varunon9.saathmetravel.models.User;
 import me.varunon9.saathmetravel.utils.FirestoreDbOperationCallback;
+import me.varunon9.saathmetravel.utils.FirestoreQuery;
+import me.varunon9.saathmetravel.utils.FirestoreQueryConditionCode;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
@@ -138,20 +145,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
 
             case R.id.chatWithTravellerButton: {
-                Chat chat = new Chat();
-                chat.setInitiatorUid(chatFragmentActivity.chatInitiatorUid);
-                chat.setInitiatorName(chatFragmentActivity.chatInitiatorName);
-                chat.setRecipientName(currentUser.getName());
-                chat.setRecipientUid(currentUser.getUid());
-
-                List<String> participants = new ArrayList<>();
-                participants.add(chatFragmentActivity.chatInitiatorUid);
-                participants.add(currentUser.getUid());
-                chat.setParticipantsUid(participants);
-
-                chatViewModel.setSelectedChat(chat);
-                chatFragmentActivity.goToChatFragment();
-                break;
+                createOrGetChatFromFirestore();
             }
         }
 
@@ -173,6 +167,102 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     public void onFailure(Object object) {
                         chatFragmentActivity.dismissProgressDialog();
                         chatFragmentActivity.showMessage("Failed to update profile!");
+                    }
+                });
+    }
+
+    private void createOrGetChatFromFirestore() {
+        String initiatorUid = chatFragmentActivity.chatInitiatorUid;
+        String recipientUid = currentUser.getUid();
+
+        if (initiatorUid.equals(recipientUid)) {
+            // user is chatting with himself, create a new chat or merge if already exists
+            createOrMergeChat(initiatorUid, recipientUid);
+        } else {
+            // check if initiatorUid_recipientUid document exists
+            chatFragmentActivity.showProgressDialog("Initiating chat",
+                    "Please wait", false);
+            String documentName = initiatorUid + "_" + recipientUid;
+            chatFragmentActivity.firestoreDbUtility.getOne(AppConstants.Collections.CHATS,
+                    documentName, new FirestoreDbOperationCallback() {
+                        @Override
+                        public void onSuccess(Object object) {
+                            DocumentSnapshot documentSnapshot = (DocumentSnapshot) object;
+                            Chat chat = documentSnapshot.toObject(Chat.class);
+
+                            if (chat != null) {
+                                chatViewModel.setSelectedChat(chat);
+                                chatFragmentActivity.dismissProgressDialog();
+                                chatFragmentActivity.goToChatFragment();
+                            } else {
+                                // check if recipientUid_initiatorUid document exists
+                                String documentName = recipientUid + "_" + initiatorUid;
+                                chatFragmentActivity.firestoreDbUtility.getOne(AppConstants.Collections.CHATS,
+                                        documentName, new FirestoreDbOperationCallback() {
+                                            @Override
+                                            public void onSuccess(Object object) {
+                                                DocumentSnapshot documentSnapshot = (DocumentSnapshot) object;
+                                                Chat chat = documentSnapshot.toObject(Chat.class);
+
+                                                if (chat != null) {
+                                                    chatViewModel.setSelectedChat(chat);
+                                                    chatFragmentActivity.dismissProgressDialog();
+                                                    chatFragmentActivity.goToChatFragment();
+                                                } else {
+                                                    // check if recipientUid_initiatorUid document exists
+                                                    chatFragmentActivity.dismissProgressDialog();
+                                                    createOrMergeChat(initiatorUid, recipientUid);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFailure(Object object) {
+                                                chatFragmentActivity.dismissProgressDialog();
+                                                chatFragmentActivity.showMessage("Failed to initiate chat!");
+                                            }
+                                        });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Object object) {
+                            chatFragmentActivity.dismissProgressDialog();
+                            chatFragmentActivity.showMessage("Failed to initiate chat!");
+                        }
+                    });
+        }
+
+    }
+
+    private void createOrMergeChat(String initiatorUid, String recipientUid) {
+        chatFragmentActivity.showProgressDialog("Initiating chat",
+                "Please wait", false);
+
+        Chat chat = new Chat();
+        chat.setId(initiatorUid + "_" + recipientUid);
+        chat.setInitiatorUid(initiatorUid);
+        chat.setInitiatorName(chatFragmentActivity.chatInitiatorName);
+        chat.setRecipientName(currentUser.getName());
+        chat.setRecipientUid(recipientUid);
+
+        List<String> participants = new ArrayList<>();
+        participants.add(initiatorUid);
+        participants.add(recipientUid);
+        chat.setParticipantsUid(participants);
+
+        chatViewModel.setSelectedChat(chat);
+        chatFragmentActivity.firestoreDbUtility.createOrMerge(AppConstants.Collections.CHATS,
+                chat.getId(), chat, new FirestoreDbOperationCallback() {
+                    @Override
+                    public void onSuccess(Object object) {
+                        chatFragmentActivity.dismissProgressDialog();
+                        chatFragmentActivity.goToChatFragment();
+                    }
+
+                    @Override
+                    public void onFailure(Object object) {
+                        chatFragmentActivity.dismissProgressDialog();
+                        chatFragmentActivity.showMessage("Failed to initiate chat!");
                     }
                 });
     }

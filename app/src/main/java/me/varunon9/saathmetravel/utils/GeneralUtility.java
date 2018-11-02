@@ -136,6 +136,7 @@ public class GeneralUtility {
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_account))
         );
         marker.setTag(user);
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
     }
 
     private void silentlyUpdateUserProfile(FirestoreDbUtility firestoreDbUtility,

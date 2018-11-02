@@ -6,13 +6,45 @@ import java.util.Date;
 
 public class Message {
 
-    private String id;
-    private String senderUid;
-    private String receiverUid;
+    private String initiatorUid;
+    private String recipientUid;
+    private String message;
 
-    private @ServerTimestamp Date date;
+    private @ServerTimestamp Date createdAt;
 
     public Message() {
-        date = new Date();
+        createdAt = new Date();
+    }
+
+    public String getInitiatorUid() {
+        return initiatorUid;
+    }
+
+    public void setInitiatorUid(String initiatorUid) {
+        this.initiatorUid = initiatorUid;
+    }
+
+    public String getRecipientUid() {
+        return recipientUid;
+    }
+
+    public void setRecipientUid(String recipientUid) {
+        this.recipientUid = recipientUid;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 }

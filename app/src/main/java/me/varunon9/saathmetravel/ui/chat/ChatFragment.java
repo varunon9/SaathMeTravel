@@ -5,16 +5,27 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import me.varunon9.saathmetravel.ChatFragmentActivity;
 import me.varunon9.saathmetravel.R;
+import me.varunon9.saathmetravel.adapters.ChatMessageListRecyclerViewAdapter;
 import me.varunon9.saathmetravel.constants.AppConstants;
 import me.varunon9.saathmetravel.models.Chat;
+import me.varunon9.saathmetravel.models.Message;
 import me.varunon9.saathmetravel.models.User;
 import me.varunon9.saathmetravel.utils.FirestoreDbOperationCallback;
 
@@ -22,6 +33,13 @@ public class ChatFragment extends Fragment {
 
     private ChatViewModel chatViewModel;
     private ChatFragmentActivity chatFragmentActivity;
+    private ChatMessageListRecyclerViewAdapter chatMessageListRecyclerViewAdapter;
+    private RecyclerView chatMessageListRecyclerView;
+    private Button chatBoxSendButton;
+    private EditText chatBoxEditText;
+    private String conversationUrl;
+    private String TAG = "ChatFragment";
+    private Chat currentChat;
 
     @Nullable
     @Override
@@ -29,6 +47,16 @@ public class ChatFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.chat_fragment, container, false);
         chatFragmentActivity = (ChatFragmentActivity) getActivity();
+        chatMessageListRecyclerView = rootView.findViewById(R.id.chatMessageListRecyclerView);
+        chatMessageListRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext()));
+        chatBoxSendButton = rootView.findViewById(R.id.chatBoxSendButton);
+        chatBoxEditText = rootView.findViewById(R.id.chatBoxEditText);
+        chatBoxSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage();
+            }
+        });
         return rootView;
     }
 
@@ -37,9 +65,14 @@ public class ChatFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         chatViewModel = ViewModelProviders.of(getActivity()).get(ChatViewModel.class);
         chatViewModel.getSelectedChat().observe(this, chat -> {
+            currentChat = chat;
             chatFragmentActivity.updateActionBarTitle(chat.getRecipientName());
             getRecipientProfileFromFirestore(chat.getRecipientUid());
-            // todo: update messages
+            conversationUrl = AppConstants.Collections.CHAT_MESSAGES
+                    + "/"
+                    + chat.getId()
+                    + "/messages";
+            getChatMessages(conversationUrl);
         });
     }
 
@@ -67,6 +100,58 @@ public class ChatFragment extends Fragment {
 
     private void updateLastSeen(User recipientUser) {
         // todo: update last seen
+    }
+
+    private void sendMessage() {
+        String message = chatBoxEditText.getText().toString();
+        if (message != null) {
+            chatBoxEditText.setText("");
+            Message messageToBeSent = new Message();
+            messageToBeSent.setMessage(message);
+            messageToBeSent.setInitiatorUid(currentChat.getInitiatorUid());
+            messageToBeSent.setRecipientUid(currentChat.getRecipientUid());
+
+            String documentName = chatFragmentActivity.generalUtility
+                    .getUniqueDocumentId(chatFragmentActivity.chatInitiatorUid);
+            chatFragmentActivity.firestoreDbUtility.createOrMerge(conversationUrl, documentName,
+                    messageToBeSent, new FirestoreDbOperationCallback() {
+                        @Override
+                        public void onSuccess(Object object) {
+                            Log.i(TAG, message + " sent");
+                        }
+
+                        @Override
+                        public void onFailure(Object object) {
+                            Log.e(TAG, "message '" + message + "' not sent");
+                        }
+                    });
+        }
+    }
+
+    private void getChatMessages(String conversationUrl) {
+        chatFragmentActivity.firestoreDbUtility.getMany(conversationUrl, null,
+                new FirestoreDbOperationCallback() {
+            @Override
+            public void onSuccess(Object object) {
+                List<Message> messageList = new ArrayList<>();
+                QuerySnapshot querySnapshot = (QuerySnapshot) object;
+                for (DocumentSnapshot documentSnapshot: querySnapshot.getDocuments()) {
+                    Message message = documentSnapshot.toObject(Message.class);
+                    messageList.add(message);
+                }
+                chatMessageListRecyclerViewAdapter = new ChatMessageListRecyclerViewAdapter(
+                        messageList, currentChat.getInitiatorUid(),
+                        currentChat.getRecipientUid()
+                );
+                chatMessageListRecyclerView
+                        .setAdapter(chatMessageListRecyclerViewAdapter);
+            }
+
+            @Override
+            public void onFailure(Object object) {
+                chatFragmentActivity.showMessage("Failed to fetch messages");
+            }
+        });
     }
 
 }

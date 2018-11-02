@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         contextUtility.showLocationOnMap(mMap, location, AppConstants.CURRENT_LOCATION_MARKER,
-                true, 12);
+                true, 10);
     }
 
     @Override
@@ -375,8 +375,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         if (mMap != null) {
             mMap.clear(); // clearing google map when leaving activity
         }

@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -27,6 +28,10 @@ public class FirestoreDbUtility {
 
     public FirestoreDbUtility() {
         db = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        db.setFirestoreSettings(settings);
     }
 
     public void createOrMerge(final String collectionName, final String documentName,
@@ -129,96 +134,98 @@ public class FirestoreDbUtility {
         try {
             CollectionReference collectionReference = db.collection(collectionName);
             Query query = null;
-            for (FirestoreQuery firestoreQuery: queryList) {
-                switch (firestoreQuery.getConditionCode()) {
-                    case FirestoreQueryConditionCode.WHERE_LESS_THAN: {
-                        if (query == null) {
-                            query = collectionReference.whereLessThan(
-                                    firestoreQuery.getField(),
-                                    firestoreQuery.getValue()
-                            );
-                        } else {
-                            query = query.whereLessThan(
-                                    firestoreQuery.getField(),
-                                    firestoreQuery.getValue()
-                            );
+            if (queryList != null) {
+                for (FirestoreQuery firestoreQuery: queryList) {
+                    switch (firestoreQuery.getConditionCode()) {
+                        case FirestoreQueryConditionCode.WHERE_LESS_THAN: {
+                            if (query == null) {
+                                query = collectionReference.whereLessThan(
+                                        firestoreQuery.getField(),
+                                        firestoreQuery.getValue()
+                                );
+                            } else {
+                                query = query.whereLessThan(
+                                        firestoreQuery.getField(),
+                                        firestoreQuery.getValue()
+                                );
+                            }
+                            break;
                         }
-                        break;
-                    }
 
-                    case FirestoreQueryConditionCode.WHERE_EQUAL_TO: {
-                        if (query == null) {
-                            query = collectionReference.whereEqualTo(
-                                    firestoreQuery.getField(),
-                                    firestoreQuery.getValue()
-                            );
-                        } else {
-                            query = query.whereEqualTo(
-                                    firestoreQuery.getField(),
-                                    firestoreQuery.getValue()
-                            );
+                        case FirestoreQueryConditionCode.WHERE_EQUAL_TO: {
+                            if (query == null) {
+                                query = collectionReference.whereEqualTo(
+                                        firestoreQuery.getField(),
+                                        firestoreQuery.getValue()
+                                );
+                            } else {
+                                query = query.whereEqualTo(
+                                        firestoreQuery.getField(),
+                                        firestoreQuery.getValue()
+                                );
+                            }
+                            break;
                         }
-                        break;
-                    }
 
-                    case FirestoreQueryConditionCode.WHERE_GREATER_THAN: {
-                        if (query == null) {
-                            query = collectionReference.whereGreaterThan(
-                                    firestoreQuery.getField(),
-                                    firestoreQuery.getValue()
-                            );
-                        } else {
-                            query = query.whereGreaterThan(
-                                    firestoreQuery.getField(),
-                                    firestoreQuery.getValue()
-                            );
+                        case FirestoreQueryConditionCode.WHERE_GREATER_THAN: {
+                            if (query == null) {
+                                query = collectionReference.whereGreaterThan(
+                                        firestoreQuery.getField(),
+                                        firestoreQuery.getValue()
+                                );
+                            } else {
+                                query = query.whereGreaterThan(
+                                        firestoreQuery.getField(),
+                                        firestoreQuery.getValue()
+                                );
+                            }
+                            break;
                         }
-                        break;
-                    }
 
-                    case FirestoreQueryConditionCode.WHERE_LESS_THAN_OR_EQUAL_TO: {
-                        if (query == null) {
-                            query = collectionReference.whereLessThanOrEqualTo(
-                                    firestoreQuery.getField(),
-                                    firestoreQuery.getValue()
-                            );
-                        } else {
-                            query = query.whereLessThanOrEqualTo(
-                                    firestoreQuery.getField(),
-                                    firestoreQuery.getValue()
-                            );
+                        case FirestoreQueryConditionCode.WHERE_LESS_THAN_OR_EQUAL_TO: {
+                            if (query == null) {
+                                query = collectionReference.whereLessThanOrEqualTo(
+                                        firestoreQuery.getField(),
+                                        firestoreQuery.getValue()
+                                );
+                            } else {
+                                query = query.whereLessThanOrEqualTo(
+                                        firestoreQuery.getField(),
+                                        firestoreQuery.getValue()
+                                );
+                            }
+                            break;
                         }
-                        break;
-                    }
 
-                    case FirestoreQueryConditionCode.WHERE_GREATER_THAN_OR_EQUAL_TO: {
-                        if (query == null) {
-                            query = collectionReference.whereGreaterThanOrEqualTo(
-                                    firestoreQuery.getField(),
-                                    firestoreQuery.getValue()
-                            );
-                        } else {
-                            query = query.whereGreaterThanOrEqualTo(
-                                    firestoreQuery.getField(),
-                                    firestoreQuery.getValue()
-                            );
+                        case FirestoreQueryConditionCode.WHERE_GREATER_THAN_OR_EQUAL_TO: {
+                            if (query == null) {
+                                query = collectionReference.whereGreaterThanOrEqualTo(
+                                        firestoreQuery.getField(),
+                                        firestoreQuery.getValue()
+                                );
+                            } else {
+                                query = query.whereGreaterThanOrEqualTo(
+                                        firestoreQuery.getField(),
+                                        firestoreQuery.getValue()
+                                );
+                            }
+                            break;
                         }
-                        break;
-                    }
 
-                    case FirestoreQueryConditionCode.WHERE_ARRAY_CONTAINS: {
-                        if (query == null) {
-                            query = collectionReference.whereArrayContains(
-                                    firestoreQuery.getField(),
-                                    firestoreQuery.getValue()
-                            );
-                        } else {
-                            query = query.whereArrayContains(
-                                    firestoreQuery.getField(),
-                                    firestoreQuery.getValue()
-                            );
+                        case FirestoreQueryConditionCode.WHERE_ARRAY_CONTAINS: {
+                            if (query == null) {
+                                query = collectionReference.whereArrayContains(
+                                        firestoreQuery.getField(),
+                                        firestoreQuery.getValue()
+                                );
+                            } else {
+                                query = query.whereArrayContains(
+                                        firestoreQuery.getField(),
+                                        firestoreQuery.getValue()
+                                );
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
             }

@@ -78,7 +78,6 @@ public class ChatListFragment extends Fragment {
                             chatList.add(chat);
                             recyclerView.setAdapter(new ChatListRecyclerViewAdapter(chatList,
                                     chatViewModel, chatFragmentActivity));
-                            chatFragmentActivity.dismissProgressDialog();
                         }
                         if (chatList.isEmpty()) {
                             chatFragmentActivity.showMessage(

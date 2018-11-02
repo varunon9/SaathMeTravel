@@ -20,8 +20,6 @@ public class Chat {
     private @ServerTimestamp Date createdAt;
     private @ServerTimestamp Date updatedAt;
 
-    private List<Message> messageList;
-
     public Chat() {
         createdAt = new Date();
         updatedAt = new Date();
@@ -65,14 +63,6 @@ public class Chat {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public List<Message> getMessageList() {
-        return messageList;
-    }
-
-    public void setMessageList(List<Message> messageList) {
-        this.messageList = messageList;
     }
 
     public String getInitiatorName() {

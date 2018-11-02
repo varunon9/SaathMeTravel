@@ -14,12 +14,14 @@ import me.varunon9.saathmetravel.ui.chat.ChatFragment;
 import me.varunon9.saathmetravel.ui.chat.ChatListFragment;
 import me.varunon9.saathmetravel.ui.chat.ProfileFragment;
 import me.varunon9.saathmetravel.utils.FirestoreDbUtility;
+import me.varunon9.saathmetravel.utils.GeneralUtility;
 
 public class ChatFragmentActivity extends AppCompatActivity {
 
     private String TAG = "ChatFragmentActivity";
     private ProgressDialog progressDialog;
     public FirestoreDbUtility firestoreDbUtility;
+    public GeneralUtility generalUtility;
     public String chatInitiatorUid;
     public String chatRecipientUid;
     public String chatInitiatorName;
@@ -34,6 +36,7 @@ public class ChatFragmentActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         firestoreDbUtility = new FirestoreDbUtility();
+        generalUtility = new GeneralUtility();
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();

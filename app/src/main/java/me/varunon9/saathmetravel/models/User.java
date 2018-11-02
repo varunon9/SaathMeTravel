@@ -16,7 +16,7 @@ public class User {
     private String name;
     private String preference;
     private String uid;
-    private boolean isOnline; // actual field created will be online
+    private boolean online;
     private String photoUrl;
 
     private @ServerTimestamp Date lastSeen;
@@ -29,7 +29,7 @@ public class User {
         createdAt = new Date();
         lastSeen = new Date();
         updatedAt = new Date();
-        isOnline = true;
+        online = true;
     }
 
     public String getEmail() {
@@ -89,11 +89,11 @@ public class User {
     }
 
     public boolean isOnline() {
-        return isOnline;
+        return online;
     }
 
     public void setOnline(boolean online) {
-        isOnline = online;
+        this.online = online;
     }
 
     public Date getLastSeen() {
