@@ -177,7 +177,7 @@ public class GeneralUtility {
 
         if (chatDate.after(yesterdayDate)) {
             // format would be 7:56 AM
-            chatDateString = new SimpleDateFormat("H:mm a", Locale.getDefault())
+            chatDateString = new SimpleDateFormat("hh:mm a", Locale.getDefault())
                     .format(chatDate);
         } else {
             // format would be 2 Nov 2018
