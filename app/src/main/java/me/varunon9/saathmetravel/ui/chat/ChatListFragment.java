@@ -30,8 +30,10 @@ import me.varunon9.saathmetravel.utils.FirestoreQueryConditionCode;
 public class ChatListFragment extends Fragment {
 
     private ViewModel chatViewModel;
-    private RecyclerView recyclerView;
     private ChatFragmentActivity chatFragmentActivity;
+    private List<Chat> chatList;
+    private ChatListRecyclerViewAdapter chatListRecyclerViewAdapter;
+    private RecyclerView recyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,6 +45,8 @@ public class ChatListFragment extends Fragment {
             Context context = view.getContext();
             recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            chatList = new ArrayList<>();
+
         }
         chatFragmentActivity = (ChatFragmentActivity) getActivity();
         return view;
@@ -52,13 +56,15 @@ public class ChatListFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         chatViewModel = ViewModelProviders.of(this.getActivity()).get(ChatViewModel.class);
+        chatListRecyclerViewAdapter = new ChatListRecyclerViewAdapter(chatList,
+                chatViewModel, chatFragmentActivity);
+        recyclerView.setAdapter(chatListRecyclerViewAdapter);
 
         getChatListFromFirestore();
 
     }
 
     private void getChatListFromFirestore() {
-        final List<Chat> chatList = new ArrayList<>();
 
         chatFragmentActivity.showProgressDialog("Fetching chats", "Please wait", false);
         List<FirestoreQuery> firestoreQueryList = new ArrayList<>();
@@ -77,8 +83,8 @@ public class ChatListFragment extends Fragment {
                             Chat chat = documentSnapshot.toObject(Chat.class);
                             chatList.add(chat);
                         }
-                        recyclerView.setAdapter(new ChatListRecyclerViewAdapter(chatList,
-                                chatViewModel, chatFragmentActivity));
+                        chatListRecyclerViewAdapter.notifyDataSetChanged();
+
                         if (chatList.isEmpty()) {
                             chatFragmentActivity.showMessage(
                                     "No chats found. Please initiate one from traveller's profile"

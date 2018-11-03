@@ -45,7 +45,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private RadioGroup genderRadioGroup;
     private RadioButton maleRadioButton;
     private RadioButton femaleRadioButton;
-    private User currentUser;
+    private User currentUser; // whose profile is being visited
     private String TAG = "ProfileFragment";
 
     @Override

@@ -13,6 +13,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -161,5 +163,24 @@ public class GeneralUtility {
         hashMap.put("lastSeen", new Date());
 
         silentlyUpdateUserProfile(firestoreDbUtility, hashMap, userUid);
+    }
+
+    // format can be 7:56 AM or 2 Nov 2018
+    public String convertDateToChatDateFormat(Date chatDate) {
+        String chatDateString = "";
+        Calendar calendar = Calendar.getInstance();
+        Date currentDate = new Date();
+        calendar.setTime(currentDate);
+        calendar.add(Calendar.DAY_OF_YEAR, -1); // 1 day ago
+        Date yesterdayDate = calendar.getTime();
+
+        if (chatDate.after(yesterdayDate)) {
+            // format would be 7:56 AM
+            chatDateString = new SimpleDateFormat("HH:mm a").format(chatDate);
+        } else {
+            // format would be 2 Nov 2018
+            chatDateString = new SimpleDateFormat("dd-MMM-yyyy").format(chatDate);
+        }
+        return chatDateString;
     }
 }

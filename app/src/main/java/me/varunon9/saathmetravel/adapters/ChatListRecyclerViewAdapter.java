@@ -40,7 +40,9 @@ public class ChatListRecyclerViewAdapter extends
         holder.mItem = mValues.get(position);
         holder.recipientTextView.setText(mValues.get(position).getRecipientName());
         holder.lastMessageTextView.setText(mValues.get(position).getLastMessage());
-        holder.timeTextView.setText(mValues.get(position).getUpdatedAt().toString());
+        holder.timeTextView.setText(chatFragmentActivity.generalUtility
+                .convertDateToChatDateFormat(mValues.get(position).getUpdatedAt())
+        );
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

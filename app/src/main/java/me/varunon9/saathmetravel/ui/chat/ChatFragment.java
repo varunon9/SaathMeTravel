@@ -18,7 +18,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import me.varunon9.saathmetravel.ChatFragmentActivity;
 import me.varunon9.saathmetravel.R;
@@ -52,7 +54,7 @@ public class ChatFragment extends Fragment {
                 rootView.findViewById(R.id.chatMessageListRecyclerView);
         chatMessageListRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext()));
         chatMessageListRecyclerViewAdapter = new ChatMessageListRecyclerViewAdapter(
-                messageList, chatFragmentActivity.chatInitiatorUid
+                messageList, chatFragmentActivity.chatInitiatorUid, chatFragmentActivity
         );
         chatMessageListRecyclerView.setAdapter(chatMessageListRecyclerViewAdapter);
 
@@ -106,14 +108,20 @@ public class ChatFragment extends Fragment {
         // todo: update last seen
     }
 
+    // todo: update lastMessage in chat
     private void sendMessage() {
         String message = chatBoxEditText.getText().toString();
         if (message != null) {
             chatBoxEditText.setText("");
             Message messageToBeSent = new Message();
             messageToBeSent.setMessage(message);
-            messageToBeSent.setInitiatorUid(currentChat.getInitiatorUid());
-            messageToBeSent.setRecipientUid(currentChat.getRecipientUid());
+            messageToBeSent.setInitiatorUid(chatFragmentActivity.chatInitiatorUid);
+
+            if (chatFragmentActivity.chatInitiatorUid.equals(currentChat.getInitiatorUid())) {
+                messageToBeSent.setRecipientUid(currentChat.getRecipientUid());
+            } else {
+                messageToBeSent.setRecipientUid(currentChat.getInitiatorUid());
+            }
 
             String documentName = chatFragmentActivity.generalUtility
                     .getUniqueDocumentId(chatFragmentActivity.chatInitiatorUid);
@@ -129,10 +137,27 @@ public class ChatFragment extends Fragment {
                             Log.e(TAG, "message '" + message + "' not sent");
                         }
                     });
+
+            // silently update lastMessage
+            Map<String, Object> hashMap = new HashMap<>();
+            hashMap.put("lastMessage", message);
+            chatFragmentActivity.firestoreDbUtility.update(AppConstants.Collections.CHATS,
+                    currentChat.getId(), hashMap, new FirestoreDbOperationCallback() {
+                        @Override
+                        public void onSuccess(Object object) {
+                            Log.i(TAG, message + " lastMessage updated");
+                        }
+
+                        @Override
+                        public void onFailure(Object object) {
+                            Log.e(TAG, "message '" + message + "' lastMessage not updated");
+                        }
+                    });
         }
     }
 
     private void getChatMessages(String conversationUrl) {
+        // todo: get only last 200 messages
         chatFragmentActivity.firestoreDbUtility.getMany(conversationUrl, null,
                 new FirestoreDbOperationCallback() {
             @Override

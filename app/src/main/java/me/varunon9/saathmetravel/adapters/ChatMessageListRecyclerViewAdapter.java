@@ -9,24 +9,26 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import me.varunon9.saathmetravel.ChatFragmentActivity;
 import me.varunon9.saathmetravel.R;
 import me.varunon9.saathmetravel.models.Message;
 
-public class ChatMessageListRecyclerViewAdapter extends RecyclerView.Adapter {
+public class ChatMessageListRecyclerViewAdapter
+        extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
 
     private List<Message> messageList;
-    private String senderUid;
-    private String receiverUid;
+    private String loggedinUserUid;
+    private ChatFragmentActivity chatFragmentActivity;
 
     public ChatMessageListRecyclerViewAdapter(List<Message> messageList,
-                                              String senderUid,
-                                              String receiverUid) {
+                                              String loggedinUserUid,
+                                              ChatFragmentActivity chatFragmentActivity) {
         this.messageList = messageList;
-        this.senderUid = senderUid;
-        this.receiverUid = receiverUid;
+        this.loggedinUserUid = loggedinUserUid;
+        this.chatFragmentActivity = chatFragmentActivity;
     }
 
     // Inflates the appropriate layout according to the ViewType.
@@ -43,6 +45,7 @@ public class ChatMessageListRecyclerViewAdapter extends RecyclerView.Adapter {
                     .inflate(R.layout.chat_message_received_item, parent, false);
             return new ReceivedMessageHolder(view);
         }
+        System.out.println("aaya");
 
         return null;
     }
@@ -65,7 +68,7 @@ public class ChatMessageListRecyclerViewAdapter extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
         Message message = (Message) messageList.get(position);
 
-        if (message.getInitiatorUid() == senderUid) {
+        if (message.getInitiatorUid().equals(loggedinUserUid)) {
             // If the current user is the sender of the message
             return VIEW_TYPE_MESSAGE_SENT;
         } else {
@@ -93,7 +96,9 @@ public class ChatMessageListRecyclerViewAdapter extends RecyclerView.Adapter {
             messageBodyTextView.setText(message.getMessage());
 
             // Format the stored timestamp into a readable String using method.
-            messageTimeTextView.setText(message.getCreatedAt().toString());
+            messageTimeTextView.setText(chatFragmentActivity.generalUtility
+                    .convertDateToChatDateFormat(message.getCreatedAt())
+            );
         }
     }
 
@@ -111,7 +116,9 @@ public class ChatMessageListRecyclerViewAdapter extends RecyclerView.Adapter {
             messageBodyTextView.setText(message.getMessage());
 
             // Format the stored timestamp into a readable String using method.
-            messageTimeTextView.setText(message.getCreatedAt().toString());
+            messageTimeTextView.setText(chatFragmentActivity.generalUtility
+                    .convertDateToChatDateFormat(message.getCreatedAt())
+            );
         }
     }
 }

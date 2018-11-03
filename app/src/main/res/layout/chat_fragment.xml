@@ -9,15 +9,18 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/chatMessageListRecyclerView"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+        android:name="me.varunon9.saathmetravel.ui.chat.ChatFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
-    </android.support.v7.widget.RecyclerView>
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/horizontalLineView"/>
 
     <!-- A horizontal line between the chatbox and RecyclerView -->
     <View
+        android:id="@+id/horizontalLineView"
         android:layout_width="0dp"
         android:layout_height="2dp"
         android:background="#dfdfdf"
@@ -28,7 +31,7 @@
 
     <LinearLayout
         android:id="@+id/chatBoxLinearLayout"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:minHeight="48dp"
@@ -39,23 +42,22 @@
 
         <EditText
             android:id="@+id/chatBoxEditText"
-            android:hint="Enter message"
+            android:hint="Type your message..."
             android:background="@android:color/transparent"
             android:layout_gravity="center"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_weight="8.8"
+            android:paddingLeft="@dimen/info_text_size"
             android:layout_height="wrap_content"
             android:maxLines="6"/>
 
         <Button
             android:id="@+id/chatBoxSendButton"
-            android:text="Send"
             android:textSize="14dp"
-            android:background="?attr/selectableItemBackground"
+            android:background="@drawable/ic_send"
             android:clickable="true"
-            android:layout_width="64dp"
+            android:layout_width="0dp"
+            android:layout_weight="1.2"
             android:layout_height="48dp"
             android:gravity="center"
             android:layout_gravity="bottom" />
