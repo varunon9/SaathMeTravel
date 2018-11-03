@@ -41,6 +41,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -113,11 +114,6 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if (doubleBackToExitPressedOnce) {
-                // updating last seen and isOnline
-                if (singleton.getFirebaseUser() != null) {
-                    generalUtility.setUserLastSeenStatus(firestoreDbUtility,
-                            singleton.getFirebaseUser().getUid());
-                }
                 super.onBackPressed();
                 return;
             }
@@ -133,6 +129,7 @@ public class MainActivity extends AppCompatActivity
             }, 2000);
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -324,20 +321,6 @@ public class MainActivity extends AppCompatActivity
 
                 // todo: set profile pic when loggedIn
                 navigationHeaderImageView.setImageResource(R.mipmap.ic_account);
-
-                // set isOnline true and update user's location
-                Map<String, Object> hashMap = new HashMap<>();
-                hashMap.put("online", true);
-                firestoreDbUtility.update(AppConstants.Collections.USERS,
-                        firebaseUser.getUid(), hashMap, new FirestoreDbOperationCallback() {
-                            @Override
-                            public void onSuccess(Object object) {
-                            }
-
-                            @Override
-                            public void onFailure(Object object) {
-                            }
-                        });
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -354,6 +337,8 @@ public class MainActivity extends AppCompatActivity
             if (location != null) {
                 Map<String, Object> hashMap = new HashMap<>();
                 hashMap.put("location", new GeoPoint(location.getLatitude(), location.getLongitude()));
+                hashMap.put("online", true);
+                hashMap.put("lastSeen", new Date());
                 firestoreDbUtility.update(AppConstants.Collections.USERS, firebaseUser.getUid(),
                         hashMap, new FirestoreDbOperationCallback() {
 
@@ -377,8 +362,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy called");
         if (mMap != null) {
             mMap.clear(); // clearing google map when leaving activity
+        }
+
+        // updating last seen and isOnline = false
+        if (singleton.getFirebaseUser() != null) {
+            generalUtility.setUserLastSeenStatus(firestoreDbUtility,
+                    singleton.getFirebaseUser().getUid());
         }
     }
 
@@ -399,7 +391,7 @@ public class MainActivity extends AppCompatActivity
                 lesserGeoPoint
         ));
         firestoreDbUtility.getMany(AppConstants.Collections.USERS,
-                firestoreQueryList, new FirestoreDbOperationCallback() {
+                firestoreQueryList,null,  new FirestoreDbOperationCallback() {
                     @Override
                     public void onSuccess(Object object) {
                         QuerySnapshot querySnapshot = (QuerySnapshot) object;
@@ -451,7 +443,7 @@ public class MainActivity extends AppCompatActivity
         ));*/
 
         firestoreDbUtility.getMany(AppConstants.Collections.SEARCH_HISTORIES,
-                firestoreQueryList, new FirestoreDbOperationCallback() {
+                firestoreQueryList, null, new FirestoreDbOperationCallback() {
                     @Override
                     public void onSuccess(Object object) {
                         QuerySnapshot querySnapshot = (QuerySnapshot) object;
@@ -531,13 +523,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void firebaseLogout() {
+        // updating isOnline = false and lastSeen
+        generalUtility.setUserLastSeenStatus(firestoreDbUtility,
+                singleton.getFirebaseUser().getUid());
+
         AuthUI.getInstance()
                 .signOut(this)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
-                        // updating isOnline and lastSeen
-                        generalUtility.setUserLastSeenStatus(firestoreDbUtility,
-                                singleton.getFirebaseUser().getUid());
 
                         singleton.setFirebaseUser(null);
                         refreshMainActivity();

@@ -22,12 +22,15 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import me.varunon9.saathmetravel.adapters.SearchHistoryArrayAdapter;
 import me.varunon9.saathmetravel.constants.AppConstants;
@@ -240,8 +243,11 @@ public class JourneyPlannerActivity extends AppCompatActivity {
                 singleton.getFirebaseUser().getUid()
         ));
 
+        Map<String, Object> orderbyHashMap = new HashMap<>();
+        orderbyHashMap.put("createdAt", Query.Direction.DESCENDING);
+
         firestoreDbUtility.getMany(AppConstants.Collections.SEARCH_HISTORIES,
-                firestoreQueryList, new FirestoreDbOperationCallback() {
+                firestoreQueryList, orderbyHashMap, new FirestoreDbOperationCallback() {
                     @Override
                     public void onSuccess(Object object) {
                         try {

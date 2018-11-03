@@ -45,7 +45,6 @@ public class ChatMessageListRecyclerViewAdapter
                     .inflate(R.layout.chat_message_received_item, parent, false);
             return new ReceivedMessageHolder(view);
         }
-        System.out.println("aaya");
 
         return null;
     }
@@ -67,7 +66,6 @@ public class ChatMessageListRecyclerViewAdapter
     @Override
     public int getItemViewType(int position) {
         Message message = (Message) messageList.get(position);
-
         if (message.getInitiatorUid().equals(loggedinUserUid)) {
             // If the current user is the sender of the message
             return VIEW_TYPE_MESSAGE_SENT;

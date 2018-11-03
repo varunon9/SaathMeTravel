@@ -72,13 +72,16 @@ public class ChatFragmentActivity extends AppCompatActivity {
             title = AppConstants.ChatFragmentActivityTitle.Chats;
             fragment = new ChatListFragment();
         }
-        updateActionBarTitle(title);
+        updateActionBarTitle(title, null);
         return fragment;
     }
 
-    public void updateActionBarTitle(String title) {
+    public void updateActionBarTitle(String title, String subtitle) {
         if (title != null) {
             getSupportActionBar().setTitle(title);
+        }
+        if (subtitle != null) {
+            getSupportActionBar().setSubtitle(subtitle);
         }
     }
 

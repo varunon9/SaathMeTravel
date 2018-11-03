@@ -14,7 +14,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -42,6 +47,8 @@ public class ChatFragment extends Fragment {
     private String TAG = "ChatFragment";
     private Chat currentChat;
     private List<Message> messageList = new ArrayList<>();
+    private ListenerRegistration listenerRegistration;
+    private RecyclerView chatMessageListRecyclerView;
 
     @Nullable
     @Override
@@ -50,9 +57,11 @@ public class ChatFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.chat_fragment, container, false);
         chatFragmentActivity = (ChatFragmentActivity) getActivity();
 
-        RecyclerView chatMessageListRecyclerView =
+        chatMessageListRecyclerView =
                 rootView.findViewById(R.id.chatMessageListRecyclerView);
-        chatMessageListRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(rootView.getContext());
+        linearLayoutManager.setStackFromEnd(true);
+        chatMessageListRecyclerView.setLayoutManager(linearLayoutManager);
         chatMessageListRecyclerViewAdapter = new ChatMessageListRecyclerViewAdapter(
                 messageList, chatFragmentActivity.chatInitiatorUid, chatFragmentActivity
         );
@@ -72,7 +81,7 @@ public class ChatFragment extends Fragment {
         chatViewModel = ViewModelProviders.of(getActivity()).get(ChatViewModel.class);
         chatViewModel.getSelectedChat().observe(this, chat -> {
             currentChat = chat;
-            chatFragmentActivity.updateActionBarTitle(chat.getRecipientName());
+            chatFragmentActivity.updateActionBarTitle(chat.getRecipientName(), null);
             getRecipientProfileFromFirestore(chat.getRecipientUid());
             conversationUrl = AppConstants.Collections.CHAT_MESSAGES
                     + "/"
@@ -105,10 +114,25 @@ public class ChatFragment extends Fragment {
     }
 
     private void updateLastSeen(User recipientUser) {
-        // todo: update last seen
+        // update online or last seen
+        String title = recipientUser.getName();
+        if (title == null) {
+            title = recipientUser.getEmail();
+        }
+        if (title == null) {
+            title = recipientUser.getMobile();
+        }
+        String subtitle = "last seen at ";
+        if (recipientUser.isOnline()) {
+            subtitle = "online";
+        } else {
+            subtitle += chatFragmentActivity.generalUtility
+                    .convertDateToChatDateFormat(recipientUser.getLastSeen());
+        }
+        chatFragmentActivity.updateActionBarTitle(title, subtitle);
     }
 
-    // todo: update lastMessage in chat
+    // send message as update lastMessage
     private void sendMessage() {
         String message = chatBoxEditText.getText().toString();
         if (message != null) {
@@ -157,24 +181,41 @@ public class ChatFragment extends Fragment {
     }
 
     private void getChatMessages(String conversationUrl) {
-        // todo: get only last 200 messages
-        chatFragmentActivity.firestoreDbUtility.getMany(conversationUrl, null,
-                new FirestoreDbOperationCallback() {
-            @Override
-            public void onSuccess(Object object) {
-                QuerySnapshot querySnapshot = (QuerySnapshot) object;
-                for (DocumentSnapshot documentSnapshot: querySnapshot.getDocuments()) {
-                    Message message = documentSnapshot.toObject(Message.class);
-                    messageList.add(message);
-                }
-                chatMessageListRecyclerViewAdapter.notifyDataSetChanged();
-            }
+        // getting last 200 messages
+        Query query = chatFragmentActivity.firestoreDbUtility.getDb().collection(conversationUrl)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .limit(200);
+        listenerRegistration = query.addSnapshotListener(
+                (queryDocumentSnapshots, e) -> {
 
-            @Override
-            public void onFailure(Object object) {
-                chatFragmentActivity.showMessage("Failed to fetch messages");
-            }
-        });
+                    if (e != null) {
+                        Log.w(TAG, "listen:error", e);
+                        return;
+                    }
+
+                    for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+                        switch (dc.getType()) {
+                            case ADDED: {
+                                Message message = dc.getDocument().toObject(Message.class);
+                                Log.d(TAG, "New message: " + message.getMessage());
+                                messageList.add(message);
+                                chatMessageListRecyclerViewAdapter.notifyDataSetChanged();
+                                chatMessageListRecyclerView.scrollToPosition(messageList.size() - 1);
+                                break;
+                            }
+                        }
+                    }
+
+                }
+        );
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (listenerRegistration != null) {
+            listenerRegistration.remove();
+        }
     }
 
 }

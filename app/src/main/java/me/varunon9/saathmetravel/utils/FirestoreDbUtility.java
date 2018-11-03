@@ -129,7 +129,11 @@ public class FirestoreDbUtility {
 
     public void getMany(final String collectionName,
                         final List<FirestoreQuery> queryList,
+                        final Map<String, Object> orderByHashMap,
                         final FirestoreDbOperationCallback callback) {
+
+        final String CREATED_AT = "createdAt";
+        final String UPDATED_AT = "updatedAt";
 
         try {
             CollectionReference collectionReference = db.collection(collectionName);
@@ -232,8 +236,29 @@ public class FirestoreDbUtility {
 
             Task<QuerySnapshot> task = null;
             if (query == null) {
-                task = collectionReference.get();
+                if (orderByHashMap != null) {
+                    if (orderByHashMap.containsKey(CREATED_AT)) {
+                        Query.Direction direction = (Query.Direction) orderByHashMap.get(CREATED_AT);
+                        task = collectionReference.orderBy(CREATED_AT, direction).get();
+                    } else if (orderByHashMap.containsKey(UPDATED_AT)) {
+                        Query.Direction direction = (Query.Direction) orderByHashMap.get(UPDATED_AT);
+                        task = collectionReference.orderBy(UPDATED_AT, direction).get();
+                    } else {
+                        task = collectionReference.get();
+                    }
+                } else {
+                    task = collectionReference.get();
+                }
             } else {
+                if (orderByHashMap != null) {
+                    if (orderByHashMap.containsKey(CREATED_AT)) {
+                        Query.Direction direction = (Query.Direction) orderByHashMap.get(CREATED_AT);
+                        query = query.orderBy(CREATED_AT, direction);
+                    } else if (orderByHashMap.containsKey(UPDATED_AT)) {
+                        Query.Direction direction = (Query.Direction) orderByHashMap.get(UPDATED_AT);
+                        query = query.orderBy(UPDATED_AT, direction);
+                    }
+                }
                 task = query.get();
             }
 
@@ -254,5 +279,9 @@ public class FirestoreDbUtility {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public FirebaseFirestore getDb() {
+        return db;
     }
 }

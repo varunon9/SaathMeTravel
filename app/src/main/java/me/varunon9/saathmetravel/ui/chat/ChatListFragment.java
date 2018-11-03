@@ -13,10 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import me.varunon9.saathmetravel.ChatFragmentActivity;
 import me.varunon9.saathmetravel.R;
@@ -73,9 +76,11 @@ public class ChatListFragment extends Fragment {
                 "participantsUid",
                 chatFragmentActivity.chatInitiatorUid
         ));
+        Map<String, Object> orderbyHashMap = new HashMap<>();
+        orderbyHashMap.put("updatedAt", Query.Direction.DESCENDING);
 
         chatFragmentActivity.firestoreDbUtility.getMany(AppConstants.Collections.CHATS,
-                firestoreQueryList, new FirestoreDbOperationCallback() {
+                firestoreQueryList, orderbyHashMap, new FirestoreDbOperationCallback() {
                     @Override
                     public void onSuccess(Object object) {
                         QuerySnapshot querySnapshot = (QuerySnapshot) object;
