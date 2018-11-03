@@ -38,7 +38,15 @@ public class ChatListRecyclerViewAdapter extends
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.recipientTextView.setText(mValues.get(position).getRecipientName());
+
+        if (mValues.get(position).getInitiatorUid().equals(chatFragmentActivity.chatInitiatorUid)) {
+            // display recipient name
+            holder.recipientTextView.setText(mValues.get(position).getRecipientName());
+        } else {
+            // display initiator name
+            holder.recipientTextView.setText(mValues.get(position).getInitiatorName());
+        }
+
         holder.lastMessageTextView.setText(mValues.get(position).getLastMessage());
         holder.timeTextView.setText(chatFragmentActivity.generalUtility
                 .convertDateToChatDateFormat(mValues.get(position).getUpdatedAt())

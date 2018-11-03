@@ -22,9 +22,9 @@ public class ChatFragmentActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     public FirestoreDbUtility firestoreDbUtility;
     public GeneralUtility generalUtility;
-    public String chatInitiatorUid;
-    public String chatRecipientUid;
-    public String chatInitiatorName;
+    public String chatInitiatorUid; // logged-in user uid
+    public String chatRecipientUid; // will be null when clicked on chats menu item
+    public String chatInitiatorName; // logged-in user name
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

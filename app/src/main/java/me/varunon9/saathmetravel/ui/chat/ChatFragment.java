@@ -81,8 +81,11 @@ public class ChatFragment extends Fragment {
         chatViewModel = ViewModelProviders.of(getActivity()).get(ChatViewModel.class);
         chatViewModel.getSelectedChat().observe(this, chat -> {
             currentChat = chat;
-            chatFragmentActivity.updateActionBarTitle(chat.getRecipientName(), null);
-            getRecipientProfileFromFirestore(chat.getRecipientUid());
+            if (chat.getInitiatorUid().equals(chatFragmentActivity.chatInitiatorUid)) {
+                getRecipientProfileFromFirestore(chat.getRecipientUid());
+            } else {
+                getRecipientProfileFromFirestore(chat.getInitiatorUid());
+            }
             conversationUrl = AppConstants.Collections.CHAT_MESSAGES
                     + "/"
                     + chat.getId()
@@ -183,7 +186,7 @@ public class ChatFragment extends Fragment {
     private void getChatMessages(String conversationUrl) {
         // getting last 200 messages
         Query query = chatFragmentActivity.firestoreDbUtility.getDb().collection(conversationUrl)
-                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .orderBy("createdAt", Query.Direction.ASCENDING)
                 .limit(200);
         listenerRegistration = query.addSnapshotListener(
                 (queryDocumentSnapshots, e) -> {

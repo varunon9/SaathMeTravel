@@ -307,15 +307,16 @@ public class MainActivity extends AppCompatActivity
 
                 loginMenuItem.setVisible(false);
 
-                if (displayName != null) {
+                Log.d(TAG, displayName + ", " + email + ", " + phoneNumber);
+                if (displayName != null && !displayName.isEmpty()) {
                     navigationHeaderTitleTextView.setText(displayName);
-                } else if (phoneNumber != null) {
+                } else if (phoneNumber != null && !phoneNumber.isEmpty()) {
                     navigationHeaderTitleTextView.setText(phoneNumber);
-                } else if (email != null) {
+                } else if (email != null && !email.isEmpty()) {
                     navigationHeaderTitleTextView.setText(email);
                 }
 
-                if (email != null) {
+                if (email != null && !email.isEmpty()) {
                     navigationHeaderSubTitleTextView.setText(email);
                 }
 
