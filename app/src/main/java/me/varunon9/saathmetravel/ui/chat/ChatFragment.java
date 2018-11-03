@@ -34,12 +34,12 @@ public class ChatFragment extends Fragment {
     private ChatViewModel chatViewModel;
     private ChatFragmentActivity chatFragmentActivity;
     private ChatMessageListRecyclerViewAdapter chatMessageListRecyclerViewAdapter;
-    private RecyclerView chatMessageListRecyclerView;
     private Button chatBoxSendButton;
     private EditText chatBoxEditText;
     private String conversationUrl;
     private String TAG = "ChatFragment";
     private Chat currentChat;
+    private List<Message> messageList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -47,15 +47,19 @@ public class ChatFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.chat_fragment, container, false);
         chatFragmentActivity = (ChatFragmentActivity) getActivity();
-        chatMessageListRecyclerView = rootView.findViewById(R.id.chatMessageListRecyclerView);
+
+        RecyclerView chatMessageListRecyclerView =
+                rootView.findViewById(R.id.chatMessageListRecyclerView);
         chatMessageListRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext()));
+        chatMessageListRecyclerViewAdapter = new ChatMessageListRecyclerViewAdapter(
+                messageList, chatFragmentActivity.chatInitiatorUid
+        );
+        chatMessageListRecyclerView.setAdapter(chatMessageListRecyclerViewAdapter);
+
         chatBoxSendButton = rootView.findViewById(R.id.chatBoxSendButton);
         chatBoxEditText = rootView.findViewById(R.id.chatBoxEditText);
-        chatBoxSendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendMessage();
-            }
+        chatBoxSendButton.setOnClickListener((view) -> {
+            sendMessage();
         });
         return rootView;
     }
@@ -133,18 +137,12 @@ public class ChatFragment extends Fragment {
                 new FirestoreDbOperationCallback() {
             @Override
             public void onSuccess(Object object) {
-                List<Message> messageList = new ArrayList<>();
                 QuerySnapshot querySnapshot = (QuerySnapshot) object;
                 for (DocumentSnapshot documentSnapshot: querySnapshot.getDocuments()) {
                     Message message = documentSnapshot.toObject(Message.class);
                     messageList.add(message);
                 }
-                chatMessageListRecyclerViewAdapter = new ChatMessageListRecyclerViewAdapter(
-                        messageList, currentChat.getInitiatorUid(),
-                        currentChat.getRecipientUid()
-                );
-                chatMessageListRecyclerView
-                        .setAdapter(chatMessageListRecyclerViewAdapter);
+                chatMessageListRecyclerViewAdapter.notifyDataSetChanged();
             }
 
             @Override

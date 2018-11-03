@@ -76,9 +76,9 @@ public class ChatListFragment extends Fragment {
                         for (DocumentSnapshot documentSnapshot: querySnapshot.getDocuments()) {
                             Chat chat = documentSnapshot.toObject(Chat.class);
                             chatList.add(chat);
-                            recyclerView.setAdapter(new ChatListRecyclerViewAdapter(chatList,
-                                    chatViewModel, chatFragmentActivity));
                         }
+                        recyclerView.setAdapter(new ChatListRecyclerViewAdapter(chatList,
+                                chatViewModel, chatFragmentActivity));
                         if (chatList.isEmpty()) {
                             chatFragmentActivity.showMessage(
                                     "No chats found. Please initiate one from traveller's profile"
