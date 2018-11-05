@@ -3,12 +3,14 @@ package me.varunon9.saathmetravel.utils;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -29,6 +31,7 @@ import me.varunon9.saathmetravel.constants.AppConstants;
 
 public class ContextUtility {
     private Context context;
+    private String TAG = "ContextUtility";
 
     public ContextUtility(Context context) {
         this.context = context;
@@ -118,5 +121,21 @@ public class ContextUtility {
                     Uri.parse("http://play.google.com/store/apps/details?id="
                             + context.getPackageName())));
         }
+    }
+
+    public void storeFcmTokenInSharedPreference(String token) {
+        SharedPreferences sharedPreferences =
+                context.getSharedPreferences(AppConstants.FCM_TOKEN, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(AppConstants.FCM_TOKEN, token);
+        editor.apply();
+        Log.d(TAG, "FCM token saved: " + token);
+    }
+
+    public String getFcmTokenFromSharedPreference() {
+        SharedPreferences sharedPreferences =
+                context.getSharedPreferences(AppConstants.FCM_TOKEN, Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString(AppConstants.FCM_TOKEN, null);
+        return token;
     }
 }

@@ -12,6 +12,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.messaging.RemoteMessage;
+
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -185,5 +188,13 @@ public class GeneralUtility {
                     .format(chatDate);
         }
         return chatDateString;
+    }
+
+    public void showLocalNotification(RemoteMessage.Notification notification) {
+        // todo
+    }
+
+    public void handlePushNotificationDataMessage(JSONObject data) {
+        // todo
     }
 }

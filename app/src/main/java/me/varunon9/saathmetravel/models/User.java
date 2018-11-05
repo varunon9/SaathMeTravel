@@ -18,6 +18,7 @@ public class User {
     private String uid;
     private boolean online;
     private String photoUrl;
+    private String fcmToken;
 
     private @ServerTimestamp Date lastSeen;
     private @ServerTimestamp Date createdAt;
@@ -126,5 +127,13 @@ public class User {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 }

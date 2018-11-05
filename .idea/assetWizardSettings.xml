@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/opt/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_send_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/opt/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/notification/ic_time_to_leave_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -33,7 +33,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_send" />
+                                      <entry key="outputName" value="ic_launcher" />
                                       <entry key="theme" value="CUSTOM" />
                                       <entry key="themeColor" value="00574b" />
                                     </map>
@@ -89,7 +89,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="color" value="ffffff" />
+                                                <entry key="color" value="00574b" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -100,7 +100,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/opt/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_account_circle_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/opt/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/notification/ic_time_to_leave_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -110,7 +110,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_account" />
+                                      <entry key="outputName" value="ic_launcher_legacy" />
                                     </map>
                                   </option>
                                 </PersistentState>

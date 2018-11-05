@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -38,7 +39,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -105,6 +108,8 @@ public class MainActivity extends AppCompatActivity
                     .setAction("Action", null).show();
         }
         checkLoginAndUpdateUi(navigationView);
+
+        // todo: check getIntent().getExtras().keySet() for notification data and take actions
     }
 
     @Override
@@ -229,6 +234,7 @@ public class MainActivity extends AppCompatActivity
                     // create user if not already created
                     User user = generalUtility.convertFirebaseUserToUser(firebaseUser,
                             singleton.getCurrentLocation());
+                    user.setFcmToken(contextUtility.getFcmTokenFromSharedPreference());
                     firestoreDbUtility.createOrMerge(AppConstants.Collections.USERS,
                             user.getUid(), user, new FirestoreDbOperationCallback() {
                                 @Override
@@ -533,8 +539,24 @@ public class MainActivity extends AppCompatActivity
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
 
-                        singleton.setFirebaseUser(null);
-                        refreshMainActivity();
+                        new AsyncTask<Void, Void, Void>() {
+
+                            @Override
+                            protected Void doInBackground(Void... voids) {
+                                try {
+                                    FirebaseInstanceId.getInstance().deleteInstanceId();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void result) {
+                                singleton.setFirebaseUser(null);
+                                refreshMainActivity();
+                            }
+                        }.execute();
                     }
                 });
     }

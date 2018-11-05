@@ -61,4 +61,6 @@ public final class AppConstants {
 
     public static final long LOCATION_REFRESH_TIME = 60 * 1000; // 60 secs
     public static float LOCATION_REFRESH_DISTANCE = 100; // 10 meters
+
+    public static String FCM_TOKEN = "fcmToken";
 }
