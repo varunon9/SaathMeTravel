@@ -413,6 +413,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showFellowTravellersOnMap(Singleton singleton) {
+        Log.d(TAG, "showFellowTravellersOnMap called");
         LatLng sourceLatLng = singleton.getSourcePlace().getLatLng();
         LatLng destinationLatLng = singleton.getDestinationPlace().getLatLng();
         int filterRange = singleton.getFilterRange();
@@ -438,7 +439,7 @@ public class MainActivity extends AppCompatActivity
                 sourceLocationLesserGeoPoint
         ));
         // todo: use destinationFilter as well
-        /*firestoreQueryList.add(new FirestoreQuery(
+        firestoreQueryList.add(new FirestoreQuery(
                 FirestoreQueryConditionCode.WHERE_LESS_THAN,
                 "destinationLocation",
                 destinationLocationGreaterGeoPoint
@@ -447,7 +448,7 @@ public class MainActivity extends AppCompatActivity
                 FirestoreQueryConditionCode.WHERE_GREATER_THAN,
                 "destinationLocation",
                 destinationLocationLesserGeoPoint
-        ));*/
+        ));
 
         firestoreDbUtility.getMany(AppConstants.Collections.SEARCH_HISTORIES,
                 firestoreQueryList, null, new FirestoreDbOperationCallback() {
@@ -456,7 +457,16 @@ public class MainActivity extends AppCompatActivity
                         QuerySnapshot querySnapshot = (QuerySnapshot) object;
                         Set<String> userUidSet = new HashSet<>();
                         for (DocumentSnapshot documentSnapshot: querySnapshot) {
-                            userUidSet.add(documentSnapshot.getData().get("userUid").toString());
+                            String userUid = documentSnapshot.getData().get("userUid").toString();
+
+                            // not user himself
+                            if (singleton.getFirebaseUser() != null) {
+                                if (!userUid.equals(singleton.getFirebaseUser().getUid())) {
+                                    userUidSet.add(userUid);
+                                }
+                            } else {
+                                userUidSet.add(userUid);
+                            }
                         }
                         if (userUidSet.isEmpty()) {
                             showMessage("No Fellow travellers found. Plan different travel");

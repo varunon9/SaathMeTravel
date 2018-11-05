@@ -58,7 +58,11 @@ public class ChatFragmentActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
-        finish();
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack();
+        } else {
+            finish();
+        }
         return true;
     }
 
@@ -110,6 +114,7 @@ public class ChatFragmentActivity extends AppCompatActivity {
         Fragment fragment = new ChatFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment)
-                .commitNow();
+                .addToBackStack(null)
+                .commit();
     }
 }

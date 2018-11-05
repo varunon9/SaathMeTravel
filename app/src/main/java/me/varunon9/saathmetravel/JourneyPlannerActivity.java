@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -50,6 +51,8 @@ public class JourneyPlannerActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private FirestoreDbUtility firestoreDbUtility;
     private GeneralUtility generalUtility;
+    private PlaceAutocompleteFragment sourceAutocompleteFragment;
+    private PlaceAutocompleteFragment destinationAutocompleteFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +66,9 @@ public class JourneyPlannerActivity extends AppCompatActivity {
         firestoreDbUtility = new FirestoreDbUtility();
         generalUtility = new GeneralUtility();
 
-        PlaceAutocompleteFragment sourceAutocompleteFragment = (PlaceAutocompleteFragment)
+        sourceAutocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.source_autocomplete_fragment);
-        PlaceAutocompleteFragment destinationAutocompleteFragment = (PlaceAutocompleteFragment)
+        destinationAutocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.destination_autocomplete_fragment);
 
         // setting filter
@@ -78,6 +81,24 @@ public class JourneyPlannerActivity extends AppCompatActivity {
         // setting hint or selected places
         setSelectedSourceAndDestinationPlace(sourceAutocompleteFragment,
                 destinationAutocompleteFragment);
+
+        // adding clear button listener
+        sourceAutocompleteFragment.getView().findViewById(R.id.place_autocomplete_clear_button)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sourceAutocompleteFragment.setText("");
+                        singleton.setSourcePlace(null);
+                    }
+                });
+        destinationAutocompleteFragment.getView().findViewById(R.id.place_autocomplete_clear_button)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        destinationAutocompleteFragment.setText("");
+                        singleton.setDestinationPlace(null);
+                    }
+                });
 
         // changing icon
         ImageView sourceSearchIcon = (ImageView)((LinearLayout)sourceAutocompleteFragment
@@ -279,6 +300,29 @@ public class JourneyPlannerActivity extends AppCompatActivity {
                         showMessage("Failed to fetch last 24 hours search histories.");
                     }
                 });
+
+        // on click of ListView would set source and destination to Singleton
+        searchHistoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SearchHistory searchHistory = searchHistoryList.get(position);
+                if (searchHistory.getSourceAddress() != null
+                        && searchHistory.getSourceLocation() != null) {
+                    Place sourcePlace =
+                            generalUtility.getPlaceFromSearchHistory(searchHistory, true);
+                    singleton.setSourcePlace(sourcePlace);
+                    sourceAutocompleteFragment.setText(sourcePlace.getAddress());
+                }
+                if (searchHistory.getDestinationAddress() != null
+                        && searchHistory.getDestinationLocation() != null) {
+                    Place destinationPlace =
+                            generalUtility.getPlaceFromSearchHistory(searchHistory, false);
+                    singleton.setDestinationPlace(destinationPlace);
+                    destinationAutocompleteFragment.setText(destinationPlace.getAddress());
+                }
+                onSearchTravellersButtonClicked(null);
+            }
+        });
 
     }
 

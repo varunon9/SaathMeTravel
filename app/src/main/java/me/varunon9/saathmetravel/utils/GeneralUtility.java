@@ -1,11 +1,14 @@
 package me.varunon9.saathmetravel.utils;
 
 import android.location.Location;
+import android.net.Uri;
 
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseUser;
@@ -20,11 +23,15 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import me.varunon9.saathmetravel.R;
 import me.varunon9.saathmetravel.constants.AppConstants;
+import me.varunon9.saathmetravel.models.SearchHistory;
 import me.varunon9.saathmetravel.models.User;
 
 public class GeneralUtility {
@@ -134,10 +141,20 @@ public class GeneralUtility {
 
     private void setTravellerMarkerOnMap(GoogleMap googleMap, GeoPoint geoPoint, User user) {
         LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+        String markerTitle = "";
+        if (user.getName() != null && !user.getName().isEmpty()) {
+            markerTitle = user.getName();
+        } else if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+            markerTitle = user.getEmail();
+        } else if (user.getMobile() != null && !user.getMobile().isEmpty()) {
+            markerTitle = user.getMobile();
+        } else {
+            markerTitle = "Unknown";
+        }
         Marker marker = googleMap.addMarker(
                 new MarkerOptions()
                         .position(latLng)
-                        .title(user.getName())
+                        .title(markerTitle)
                         .snippet(user.getEmail())
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_account))
         );
@@ -196,5 +213,98 @@ public class GeneralUtility {
 
     public void handlePushNotificationDataMessage(JSONObject data) {
         // todo
+    }
+
+    public Place getPlaceFromSearchHistory(SearchHistory searchHistory, boolean isSourcePlace) {
+        Place place = new Place() {
+            @Override
+            public String getId() {
+                return null;
+            }
+
+            @Override
+            public List<Integer> getPlaceTypes() {
+                return null;
+            }
+
+            @Nullable
+            @Override
+            public CharSequence getAddress() {
+                if (isSourcePlace) {
+                    return searchHistory.getSourceAddress();
+                } else {
+                    return searchHistory.getDestinationAddress();
+                }
+            }
+
+            @Override
+            public Locale getLocale() {
+                return null;
+            }
+
+            @Override
+            public CharSequence getName() {
+                return null;
+            }
+
+            @Override
+            public LatLng getLatLng() {
+                if (isSourcePlace) {
+                    GeoPoint geoPoint = searchHistory.getSourceLocation();
+                    LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+                    return latLng;
+                } else {
+                    GeoPoint geoPoint = searchHistory.getDestinationLocation();
+                    LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+                    return latLng;
+                }
+            }
+
+            @Nullable
+            @Override
+            public LatLngBounds getViewport() {
+                return null;
+            }
+
+            @Nullable
+            @Override
+            public Uri getWebsiteUri() {
+                return null;
+            }
+
+            @Nullable
+            @Override
+            public CharSequence getPhoneNumber() {
+                return null;
+            }
+
+            @Override
+            public float getRating() {
+                return 0;
+            }
+
+            @Override
+            public int getPriceLevel() {
+                return 0;
+            }
+
+            @Nullable
+            @Override
+            public CharSequence getAttributions() {
+                return null;
+            }
+
+            @Override
+            public Place freeze() {
+                return null;
+            }
+
+            @Override
+            public boolean isDataValid() {
+                return false;
+            }
+        };
+
+        return place;
     }
 }
