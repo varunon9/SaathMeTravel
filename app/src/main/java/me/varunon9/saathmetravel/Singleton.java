@@ -1,15 +1,11 @@
 package me.varunon9.saathmetravel;
 
 import android.content.Context;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.places.Place;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,7 +18,6 @@ import me.varunon9.saathmetravel.constants.AppConstants;
 
 public class Singleton {
     private static Singleton singleton;
-    private RequestQueue requestQueue;
     private Context context;
     private String TAG = "Singleton";
     private FirebaseUser firebaseUser;
@@ -35,7 +30,6 @@ public class Singleton {
 
     private Singleton(Context context) {
         this.context = context;
-        requestQueue = getRequestQueue();
         filterRange = 5; // 5 KM by default
 
         setLiveLocationListener();
@@ -76,13 +70,6 @@ public class Singleton {
             singleton = new Singleton(context);
         }
         return singleton;
-    }
-
-    public RequestQueue getRequestQueue() {
-        if (requestQueue == null) {
-            requestQueue = Volley.newRequestQueue(context);
-        }
-        return requestQueue;
     }
 
     public Location getCurrentLocation() {

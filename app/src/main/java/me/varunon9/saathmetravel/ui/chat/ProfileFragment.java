@@ -65,6 +65,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         updateProfileButton.setOnClickListener(this);
         chatWithTravellerButton.setOnClickListener(this);
 
+        String title = AppConstants.ChatFragmentActivityTitle.PROFILE;
+        chatFragmentActivity.updateActionBarTitle(title, "");
+
         return rootView;
     }
 

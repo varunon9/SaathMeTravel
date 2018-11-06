@@ -73,7 +73,7 @@ public class JourneyPlannerActivity extends AppCompatActivity {
 
         // setting filter
         AutocompleteFilter autocompleteFilter = new AutocompleteFilter.Builder()
-                .setTypeFilter(TYPE_FILTER_ADDRESS)
+                //.setTypeFilter(TYPE_FILTER_ADDRESS)
                 .build();
         sourceAutocompleteFragment.setFilter(autocompleteFilter);
         destinationAutocompleteFragment.setFilter(autocompleteFilter);

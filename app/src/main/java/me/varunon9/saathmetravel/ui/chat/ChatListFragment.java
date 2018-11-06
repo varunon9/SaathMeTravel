@@ -52,6 +52,9 @@ public class ChatListFragment extends Fragment {
 
         }
         chatFragmentActivity = (ChatFragmentActivity) getActivity();
+
+        String title = AppConstants.ChatFragmentActivityTitle.Chats;
+        chatFragmentActivity.updateActionBarTitle(title, "");
         return view;
     }
 

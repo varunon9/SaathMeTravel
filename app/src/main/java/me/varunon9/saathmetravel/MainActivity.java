@@ -403,6 +403,9 @@ public class MainActivity extends AppCompatActivity
                     public void onSuccess(Object object) {
                         QuerySnapshot querySnapshot = (QuerySnapshot) object;
                         generalUtility.showTravellersOnMap(mMap, querySnapshot);
+                        if (querySnapshot.isEmpty()) {
+                            showMessage("No nearby travellers found.");
+                        }
                     }
 
                     @Override
