@@ -418,74 +418,59 @@ public class MainActivity extends AppCompatActivity
         LatLng destinationLatLng = singleton.getDestinationPlace().getLatLng();
         int filterRange = singleton.getFilterRange();
 
-        GeoPoint sourceLocationLesserGeoPoint =
-                generalUtility.getLesserGeoPointFromLatLng(sourceLatLng, filterRange);
-        GeoPoint sourceLocationGreaterGeoPoint =
-                generalUtility.getGreaterGeoPointFromLatLng(sourceLatLng, filterRange);
-        GeoPoint destinationLocationLesserGeoPoint =
-                generalUtility.getLesserGeoPointFromLatLng(destinationLatLng, filterRange);
-        GeoPoint destinationLocationGreaterGeoPoint =
-                generalUtility.getGreaterGeoPointFromLatLng(destinationLatLng, filterRange);
+        try {
+            generalUtility.getTravellersAroundALocation(sourceLatLng, filterRange,
+                    firestoreDbUtility, singleton, true,
+                    new FirestoreDbOperationCallback() {
+                        @Override
+                        public void onSuccess(Object object) {
+                            Set<String> sourceUserUidSet = (Set<String>) object;
+                            generalUtility.getTravellersAroundALocation(destinationLatLng, filterRange,
+                                    firestoreDbUtility, singleton, false,
+                                    new FirestoreDbOperationCallback() {
+                                        @Override
+                                        public void onSuccess(Object object) {
+                                            Set<String> destinationUserUidSet = (Set<String>) object;
 
-        List<FirestoreQuery> firestoreQueryList = new ArrayList<>();
-        firestoreQueryList.add(new FirestoreQuery(
-                FirestoreQueryConditionCode.WHERE_LESS_THAN,
-                "sourceLocation",
-                sourceLocationGreaterGeoPoint
-        ));
-        firestoreQueryList.add(new FirestoreQuery(
-                FirestoreQueryConditionCode.WHERE_GREATER_THAN,
-                "sourceLocation",
-                sourceLocationLesserGeoPoint
-        ));
-        // todo: use destinationFilter as well
-        firestoreQueryList.add(new FirestoreQuery(
-                FirestoreQueryConditionCode.WHERE_LESS_THAN,
-                "destinationLocation",
-                destinationLocationGreaterGeoPoint
-        ));
-        firestoreQueryList.add(new FirestoreQuery(
-                FirestoreQueryConditionCode.WHERE_GREATER_THAN,
-                "destinationLocation",
-                destinationLocationLesserGeoPoint
-        ));
+                                            // merging the userUidSet
+                                            Set<String> userUidSet = new HashSet<>();
+                                            for (String userUid: sourceUserUidSet) {
+                                                if (destinationUserUidSet.contains(userUid)) {
+                                                    userUidSet.add(userUid);
+                                                }
+                                            }
 
-        firestoreDbUtility.getMany(AppConstants.Collections.SEARCH_HISTORIES,
-                firestoreQueryList, null, new FirestoreDbOperationCallback() {
-                    @Override
-                    public void onSuccess(Object object) {
-                        QuerySnapshot querySnapshot = (QuerySnapshot) object;
-                        Set<String> userUidSet = new HashSet<>();
-                        for (DocumentSnapshot documentSnapshot: querySnapshot) {
-                            String userUid = documentSnapshot.getData().get("userUid").toString();
+                                            if (userUidSet.isEmpty()) {
+                                                showMessage("No Fellow travellers found. Plan different travel");
+                                            } else {
+                                                showMessage(userUidSet.size() + " fellow travellers found");
+                                                if (mMap != null) {
+                                                    //mMap.clear();
+                                                    for (String userUid: userUidSet) {
+                                                        generalUtility.showSingleTravellerOnMap(
+                                                                firestoreDbUtility,
+                                                                mMap, userUid);
+                                                    }
+                                                }
+                                            }
+                                        }
 
-                            // not user himself
-                            if (singleton.getFirebaseUser() != null) {
-                                if (!userUid.equals(singleton.getFirebaseUser().getUid())) {
-                                    userUidSet.add(userUid);
-                                }
-                            } else {
-                                userUidSet.add(userUid);
-                            }
+                                        @Override
+                                        public void onFailure(Object object) {
+                                            showMessage("Failed to locate fellow travellers.");
+                                        }
+                                    });
                         }
-                        if (userUidSet.isEmpty()) {
-                            showMessage("No Fellow travellers found. Plan different travel");
-                        } else {
-                            if (mMap != null) {
-                                //mMap.clear();
-                                for (String userUid: userUidSet) {
-                                    generalUtility.showSingleTravellerOnMap(firestoreDbUtility,
-                                            mMap, userUid);
-                                }
-                            }
-                        }
-                    }
 
-                    @Override
-                    public void onFailure(Object object) {
-                        showMessage("Failed to locate fellow travellers.");
-                    }
-                });
+                        @Override
+                        public void onFailure(Object object) {
+                            showMessage("Failed to locate fellow travellers.");
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+            showMessage("Something went wrong. Clear the journey filters to get nearby travellers");
+        }
     }
 
     private void showMessage(String message) {

@@ -20,16 +20,20 @@ import com.google.firebase.messaging.RemoteMessage;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
 import me.varunon9.saathmetravel.R;
+import me.varunon9.saathmetravel.Singleton;
 import me.varunon9.saathmetravel.constants.AppConstants;
 import me.varunon9.saathmetravel.models.SearchHistory;
 import me.varunon9.saathmetravel.models.User;
@@ -89,6 +93,7 @@ public class GeneralUtility {
         return greaterGeoPoint;
     }
 
+    // being used for nearby
     public void showTravellersOnMap(GoogleMap googleMap, QuerySnapshot querySnapshot) {
         if (googleMap != null) {
             //googleMap.clear();
@@ -306,5 +311,63 @@ public class GeneralUtility {
         };
 
         return place;
+    }
+
+    public void getTravellersAroundALocation(LatLng locationLatLng,
+                                             int filterRange,
+                                             FirestoreDbUtility firestoreDbUtility,
+                                             Singleton singleton,
+                                             boolean isSourcePlace,
+                                             FirestoreDbOperationCallback callback) {
+        GeoPoint locationLesserGeoPoint =
+                getLesserGeoPointFromLatLng(locationLatLng, filterRange);
+        GeoPoint locationGreaterGeoPoint =
+                getGreaterGeoPointFromLatLng(locationLatLng, filterRange);
+        String queryField;
+        if (isSourcePlace) {
+            queryField = "sourceLocation";
+        } else {
+            queryField = "destinationLocation";
+        }
+        List<FirestoreQuery> firestoreQueryList = new ArrayList<>();
+
+        firestoreQueryList.add(new FirestoreQuery(
+                FirestoreQueryConditionCode.WHERE_LESS_THAN,
+                queryField,
+                locationGreaterGeoPoint
+        ));
+        firestoreQueryList.add(new FirestoreQuery(
+                FirestoreQueryConditionCode.WHERE_GREATER_THAN,
+                queryField,
+                locationLesserGeoPoint
+        ));
+
+        firestoreDbUtility.getMany(AppConstants.Collections.SEARCH_HISTORIES,
+                firestoreQueryList, null, new FirestoreDbOperationCallback() {
+                    @Override
+                    public void onSuccess(Object object) {
+                        QuerySnapshot querySnapshot = (QuerySnapshot) object;
+                        Set<String> userUidSet = new HashSet<>();
+                        for (DocumentSnapshot documentSnapshot: querySnapshot) {
+                            String userUid = documentSnapshot.getData().get("userUid").toString();
+
+                            // not user himself
+                            if (singleton.getFirebaseUser() != null) {
+                                if (!userUid.equals(singleton.getFirebaseUser().getUid())) {
+                                    userUidSet.add(userUid);
+                                }
+                            } else {
+                                userUidSet.add(userUid);
+                            }
+                        }
+                        callback.onSuccess(userUidSet);
+                    }
+
+                    @Override
+                    public void onFailure(Object object) {
+                        callback.onFailure(object);
+                    }
+                });
+
     }
 }

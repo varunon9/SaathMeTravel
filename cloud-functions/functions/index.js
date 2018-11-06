@@ -125,7 +125,7 @@ function sendWelcomeEmail(email, displayName) {
 
     Happy Saath Me Travelling :D
 
-    To provide feedback, please write to us at info.saathmetravel@gmail.com
+    We are in beta. Please provide your valuable feedback at info.saathmetravel@gmail.com
   `;
   mailTransport.sendMail(mailOptions).then(() => {
     console.log('New welcome email sent to:', email);
