@@ -23,6 +23,22 @@
           }
         },
         {
+          "client_id": "777510929605-agai0ijogjti5um6h4sqhqrj47hlvj5l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.varunon9.saathmetravel",
+            "certificate_hash": "6185476084dc14e5b367dcbfbf1d9f0d34713b17"
+          }
+        },
+        {
+          "client_id": "777510929605-4solq73nl6ubl6h0vc08f6l2fopr9der.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.varunon9.saathmetravel",
+            "certificate_hash": "c6a63ac7a673080e28e91bfb4169be7b5db990fa"
+          }
+        },
+        {
           "client_id": "777510929605-nad5pqfda9sm4tolvbgis2mmqcbmkdfc.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        //getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -405,6 +405,8 @@ public class MainActivity extends AppCompatActivity
                         generalUtility.showTravellersOnMap(mMap, querySnapshot);
                         if (querySnapshot.isEmpty()) {
                             showMessage("No nearby travellers found.");
+                        } else {
+                            showMessage(querySnapshot.size() + " travellers found nearby");
                         }
                     }
 
@@ -446,7 +448,7 @@ public class MainActivity extends AppCompatActivity
                                             if (userUidSet.isEmpty()) {
                                                 showMessage("No Fellow travellers found. Plan different travel");
                                             } else {
-                                                showMessage(userUidSet.size() + " fellow travellers found");
+                                                showMessage(userUidSet.size() + " fellow travellers found. Zoom out map to see all.");
                                                 if (mMap != null) {
                                                     //mMap.clear();
                                                     for (String userUid: userUidSet) {

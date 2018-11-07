@@ -1,10 +1,12 @@
 package me.varunon9.saathmetravel;
 
 import android.content.Context;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.location.places.Place;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,7 +32,6 @@ public class Singleton {
 
     private Singleton(Context context) {
         this.context = context;
-        filterRange = 5; // 5 KM by default
 
         setLiveLocationListener();
     }
@@ -39,6 +40,7 @@ public class Singleton {
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                Log.d(TAG, "onLocationChanged " + location);
                 setLocation(location);
             }
 
@@ -54,8 +56,10 @@ public class Singleton {
             public void onProviderDisabled(String provider) {
             }
         };
-        locationManager =
-                (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+        if (locationManager == null) {
+            locationManager =
+                    (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+        }
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                     AppConstants.LOCATION_REFRESH_TIME, AppConstants.LOCATION_REFRESH_DISTANCE,
@@ -73,23 +77,28 @@ public class Singleton {
     }
 
     public Location getCurrentLocation() {
-        /*if (locationManager == null) {
-            locationManager =
-                    (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+        if (getLocation() == null) {
+            // fallback to last known location
+            if (locationManager == null) {
+                locationManager =
+                        (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+            }
+            Location location = null;
+            try {
+                Criteria criteria = new Criteria();
+                location = locationManager.getLastKnownLocation(
+                        locationManager.getBestProvider(criteria, false)
+                );
+            } catch (SecurityException e) {
+                e.printStackTrace(); // permission denied
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            setLocation(location);
+            return location;
+        } else {
+            return getLocation();
         }
-        Location location = null;
-        try {
-            Criteria criteria = new Criteria();
-            location = locationManager.getLastKnownLocation(
-                    locationManager.getBestProvider(criteria, false)
-            );
-        } catch (SecurityException e) {
-            e.printStackTrace(); // permission denied
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return location;*/
-        return getLocation();
     }
 
     public FirebaseUser getFirebaseUser() {
