@@ -341,23 +341,25 @@ public class MainActivity extends AppCompatActivity
         FirebaseUser firebaseUser = singleton.getFirebaseUser();
         Location location = singleton.getCurrentLocation();
         if (firebaseUser != null) {
+            Map<String, Object> hashMap = new HashMap<>();
+
             if (location != null) {
-                Map<String, Object> hashMap = new HashMap<>();
                 hashMap.put("location", new GeoPoint(location.getLatitude(), location.getLongitude()));
-                hashMap.put("online", true);
-                hashMap.put("lastSeen", new Date());
-                firestoreDbUtility.update(AppConstants.Collections.USERS, firebaseUser.getUid(),
-                        hashMap, new FirestoreDbOperationCallback() {
-
-                            @Override
-                            public void onSuccess(Object object) {
-                            }
-
-                            @Override
-                            public void onFailure(Object object) {
-                            }
-                        });
             }
+
+            hashMap.put("online", true);
+            hashMap.put("lastSeen", new Date());
+            firestoreDbUtility.update(AppConstants.Collections.USERS, firebaseUser.getUid(),
+                    hashMap, new FirestoreDbOperationCallback() {
+
+                        @Override
+                        public void onSuccess(Object object) {
+                        }
+
+                        @Override
+                        public void onFailure(Object object) {
+                        }
+                    });
         }
         if (singleton.getSourcePlace() != null && singleton.getDestinationPlace() != null) {
             showFellowTravellersOnMap(singleton);
@@ -382,6 +384,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showNearbyTravellersOnMap(Location location) {
+        Log.d(TAG, "showNearbyTravellersOnMap for " + location);
+        if (location == null) {
+            // this should only happen when permission is not granted
+            showMessage("Unable to get your location. Please grant location permission from device settings");
+            return;
+        }
         int range = AppConstants.DEFAULT_RANGE;
         GeoPoint lesserGeoPoint = generalUtility.getLesserGeoPointFromLocation(location, range);
         GeoPoint greaterGeoPoint = generalUtility.getGreaterGeoPointFromLocation(location, range);

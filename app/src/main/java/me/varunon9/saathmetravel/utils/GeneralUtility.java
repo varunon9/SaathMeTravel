@@ -100,10 +100,12 @@ public class GeneralUtility {
             LatLng latLng = null;
             for (DocumentSnapshot documentSnapshot: querySnapshot.getDocuments()) {
                 try {
-                    GeoPoint geoPoint = (GeoPoint) documentSnapshot.getData().get("location");
-                    if (geoPoint != null) {
-                        User user = documentSnapshot.toObject(User.class);
-                        setTravellerMarkerOnMap(googleMap, geoPoint, user);
+                    if (documentSnapshot.getData() != null) {
+                        GeoPoint geoPoint = (GeoPoint) documentSnapshot.getData().get("location");
+                        if (geoPoint != null) {
+                            User user = documentSnapshot.toObject(User.class);
+                            setTravellerMarkerOnMap(googleMap, geoPoint, user);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -125,10 +127,12 @@ public class GeneralUtility {
             @Override
             public void onSuccess(Object object) {
                 DocumentSnapshot documentSnapshot = (DocumentSnapshot) object;
-                GeoPoint geoPoint = (GeoPoint) documentSnapshot.getData().get("location");
-                if (geoPoint != null) {
-                    User user = documentSnapshot.toObject(User.class);
-                    setTravellerMarkerOnMap(googleMap, geoPoint, user);
+                if (documentSnapshot.getData() != null) {
+                    GeoPoint geoPoint = (GeoPoint) documentSnapshot.getData().get("location");
+                    if (geoPoint != null) {
+                        User user = documentSnapshot.toObject(User.class);
+                        setTravellerMarkerOnMap(googleMap, geoPoint, user);
+                    }
                 }
             }
 
@@ -349,15 +353,17 @@ public class GeneralUtility {
                         QuerySnapshot querySnapshot = (QuerySnapshot) object;
                         Set<String> userUidSet = new HashSet<>();
                         for (DocumentSnapshot documentSnapshot: querySnapshot) {
-                            String userUid = documentSnapshot.getData().get("userUid").toString();
+                            if (documentSnapshot.getData() != null) {
+                                String userUid = documentSnapshot.getData().get("userUid").toString();
 
-                            // not user himself
-                            if (singleton.getFirebaseUser() != null) {
-                                if (!userUid.equals(singleton.getFirebaseUser().getUid())) {
+                                // not user himself
+                                if (singleton.getFirebaseUser() != null) {
+                                    if (!userUid.equals(singleton.getFirebaseUser().getUid())) {
+                                        userUidSet.add(userUid);
+                                    }
+                                } else {
                                     userUidSet.add(userUid);
                                 }
-                            } else {
-                                userUidSet.add(userUid);
                             }
                         }
                         callback.onSuccess(userUidSet);

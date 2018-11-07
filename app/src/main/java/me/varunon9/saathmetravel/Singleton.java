@@ -3,11 +3,11 @@ package me.varunon9.saathmetravel;
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,44 +29,12 @@ public class Singleton {
     private int filterRange;
     private Location location;
     private LocationManager locationManager;
+    private FusedLocationProviderClient fusedLocationProviderClient;
 
     private Singleton(Context context) {
         this.context = context;
-
-        setLiveLocationListener();
-    }
-
-    private void setLiveLocationListener() {
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                Log.d(TAG, "onLocationChanged " + location);
-                setLocation(location);
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-            }
-        };
-        if (locationManager == null) {
-            locationManager =
-                    (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
-        }
-        try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    AppConstants.LOCATION_REFRESH_TIME, AppConstants.LOCATION_REFRESH_DISTANCE,
-                    locationListener);
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        }
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
+        getLastLocation();
     }
 
     public static synchronized Singleton getInstance(Context context) {
@@ -79,6 +47,7 @@ public class Singleton {
     public Location getCurrentLocation() {
         if (getLocation() == null) {
             // fallback to last known location
+            Log.d(TAG, "Fallback to getLastKnownLocation using Criteria and provider");
             if (locationManager == null) {
                 locationManager =
                         (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
@@ -94,9 +63,10 @@ public class Singleton {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            setLocation(location);
+            getLastLocation(); // setting fused location again
             return location;
         } else {
+            Log.d(TAG, "Using FusedLocationProviderClient to get last location");
             return getLocation();
         }
     }
@@ -147,5 +117,16 @@ public class Singleton {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    private void getLastLocation() {
+        try {
+            fusedLocationProviderClient.getLastLocation()
+                    .addOnSuccessListener(location -> setLocation(location));
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
