@@ -8,8 +8,8 @@ android {
         applicationId "me.varunon9.saathmetravel"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 8
-        versionName "1.7"
+        versionCode 9
+        versionName "1.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
