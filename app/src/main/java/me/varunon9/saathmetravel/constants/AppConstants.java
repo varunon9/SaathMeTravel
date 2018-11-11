@@ -11,6 +11,17 @@ public final class AppConstants {
     private AppConstants() {
     }
 
+    public static class Urls {
+        private Urls() {
+        }
+
+        //private static final String DOMAIN = "http://192.168.43.147:4000";
+        private static final String DOMAIN =
+                "https://us-central1-saathmetravel.cloudfunctions.net";
+        public static final String DIRECTIONS =
+                DOMAIN + "/api/directions/";
+    }
+
     public static final int ACCESS_LOCATION_REQUEST_CODE = 1;
     public static final int LOGIN_REQUEST_CODE = 2;
     public static final String ACCESS_LOCATION_TOAST_MESSAGE =

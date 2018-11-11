@@ -36,12 +36,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.iid.FirebaseInstanceId;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -59,6 +57,7 @@ import me.varunon9.saathmetravel.utils.FirestoreDbUtility;
 import me.varunon9.saathmetravel.utils.FirestoreQuery;
 import me.varunon9.saathmetravel.utils.FirestoreQueryConditionCode;
 import me.varunon9.saathmetravel.utils.GeneralUtility;
+import me.varunon9.saathmetravel.utils.map.MapUtility;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -71,6 +70,7 @@ public class MainActivity extends AppCompatActivity
     private boolean doubleBackToExitPressedOnce = false;
     private GeneralUtility generalUtility;
     private FirestoreDbUtility firestoreDbUtility;
+    private MapUtility mapUtility;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,8 +91,6 @@ public class MainActivity extends AppCompatActivity
 
         singleton = Singleton.getInstance(getApplicationContext());
 
-        View mapView = findViewById(R.id.map);
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -101,11 +99,11 @@ public class MainActivity extends AppCompatActivity
         contextUtility = new ContextUtility(this);
         generalUtility = new GeneralUtility();
         firestoreDbUtility = new FirestoreDbUtility();
+        mapUtility = new MapUtility(this);
 
         // check if internet connection is available
         if (!contextUtility.isConnectedToNetwork()) {
-            Snackbar.make(mapView, AppConstants.INTERNET_CONNECTION_IS_MANDATORY, Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
+            showMessage(AppConstants.INTERNET_CONNECTION_IS_MANDATORY);
         }
         checkLoginAndUpdateUi(navigationView);
 
@@ -191,11 +189,7 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "onMapReady called");
         mMap = googleMap;
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
         mMap.setOnMarkerClickListener(this);
-        if (bundle != null) {
-        }
         Location location = null;
         if (contextUtility.isBuildVersionGreaterEqualToMarshmallow()) {
             if (contextUtility.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -452,6 +446,8 @@ public class MainActivity extends AppCompatActivity
                                                     userUidSet.add(userUid);
                                                 }
                                             }
+
+                                            mapUtility.drawPathBetweenTwoLatLng(mMap, sourceLatLng, destinationLatLng);
 
                                             if (userUidSet.isEmpty()) {
                                                 showMessage("No Fellow travellers found. Plan different travel");

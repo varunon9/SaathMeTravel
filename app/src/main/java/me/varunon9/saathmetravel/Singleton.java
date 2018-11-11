@@ -6,6 +6,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.util.Log;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
@@ -30,11 +32,13 @@ public class Singleton {
     private Location location;
     private LocationManager locationManager;
     private FusedLocationProviderClient fusedLocationProviderClient;
+    private RequestQueue requestQueue;
 
     private Singleton(Context context) {
         this.context = context;
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
         getLastLocation();
+        requestQueue = getRequestQueue();
     }
 
     public static synchronized Singleton getInstance(Context context) {
@@ -42,6 +46,13 @@ public class Singleton {
             singleton = new Singleton(context);
         }
         return singleton;
+    }
+
+    public RequestQueue getRequestQueue() {
+        if (requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(context);
+        }
+        return requestQueue;
     }
 
     public Location getCurrentLocation() {
