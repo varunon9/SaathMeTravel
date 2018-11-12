@@ -34,6 +34,9 @@ public class Singleton {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private RequestQueue requestQueue;
 
+    // assuming that new update is available, once fetched from remote config, will set to false
+    private boolean updateAvailable = true;
+
     private Singleton(Context context) {
         this.context = context;
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
@@ -139,5 +142,13 @@ public class Singleton {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isUpdateAvailable() {
+        return updateAvailable;
+    }
+
+    public void setUpdateAvailable(boolean updateAvailable) {
+        this.updateAvailable = updateAvailable;
     }
 }

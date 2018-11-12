@@ -8,8 +8,8 @@ android {
         applicationId "me.varunon9.saathmetravel"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 9
-        versionName "1.8"
+        versionCode 10
+        versionName "1.9"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -44,7 +44,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:16.0.5'
     implementation 'com.google.firebase:firebase-firestore:17.1.2'
     implementation 'com.google.firebase:firebase-messaging:17.3.4'
-    compile 'com.android.support:multidex:1.0.3'
+    implementation 'com.google.firebase:firebase-config:16.1.0'
+    implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.6'
     implementation 'com.android.volley:volley:1.1.1'
 }

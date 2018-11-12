@@ -2,6 +2,7 @@ package me.varunon9.saathmetravel.utils;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -21,6 +23,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
+import me.varunon9.saathmetravel.R;
 import me.varunon9.saathmetravel.constants.AppConstants;
 
 /**
@@ -137,5 +140,21 @@ public class ContextUtility {
                 context.getSharedPreferences(AppConstants.FCM_TOKEN, Context.MODE_PRIVATE);
         String token = sharedPreferences.getString(AppConstants.FCM_TOKEN, null);
         return token;
+    }
+
+    public void showUpdateAlert(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        message = "What's new-\n" + message;
+        builder.setTitle("New Update Available")
+                .setMessage(message)
+                .setPositiveButton("Update", (dialog, which) -> {
+                    // go to playstore
+                    rateApp();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    // do nothing
+                })
+                .setIcon(R.drawable.ic_launcher)
+                .show();
     }
 }

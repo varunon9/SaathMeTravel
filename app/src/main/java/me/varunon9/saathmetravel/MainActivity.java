@@ -39,6 +39,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,6 +108,8 @@ public class MainActivity extends AppCompatActivity
             showMessage(AppConstants.INTERNET_CONNECTION_IS_MANDATORY);
         }
         checkLoginAndUpdateUi(navigationView);
+
+        checkAndShowUpdateAvailableAlert();
 
         // todo: check getIntent().getExtras().keySet() for notification data and take actions
     }
@@ -578,5 +582,58 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(MainActivity.this, ChatFragmentActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    private void checkAndShowUpdateAvailableAlert() {
+        try {
+            String VERSION = "version";
+            String NEW_FEATURES = "newFeatures";
+
+            if (singleton.isUpdateAvailable()) {
+                FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+                FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                        .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                        .build();
+                firebaseRemoteConfig.setConfigSettings(configSettings);
+
+                Map<String, Object> defaultValueHashMap = new HashMap<>();
+                defaultValueHashMap.put(VERSION, BuildConfig.VERSION_CODE);
+                defaultValueHashMap.put(NEW_FEATURES, "");
+
+                firebaseRemoteConfig.setDefaults(defaultValueHashMap);
+
+                long cacheExpiration = 3600; // 1 hour in seconds.
+                if (firebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
+                    cacheExpiration = 0;
+                }
+
+                firebaseRemoteConfig.fetch(cacheExpiration)
+                        .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    // showing update alert only one time
+                                    singleton.setUpdateAvailable(false);
+
+                                    firebaseRemoteConfig.activateFetched();
+                                    long remoteVersionCode = firebaseRemoteConfig.getLong(VERSION);
+                                    String newFeatures = firebaseRemoteConfig.getString(NEW_FEATURES);
+                                    Log.d(TAG, "Remote version: " + remoteVersionCode
+                                            + ", New Features: " + newFeatures);
+                                    if (remoteVersionCode > BuildConfig.VERSION_CODE
+                                            && newFeatures != null
+                                            && !newFeatures.isEmpty()) {
+                                        contextUtility.showUpdateAlert(newFeatures);
+                                    }
+
+                                } else {
+                                    Log.e(TAG, "Remote config fetch failed");
+                                }
+                            }
+                        });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
