@@ -209,6 +209,9 @@ public class JourneyPlannerActivity extends AppCompatActivity {
             saveSearchHistory(sourcePlace, destinationPlace, singleton);
         }
 
+        // clear current zoom level and target
+        singleton.setGoogleMapCurrentCameraPosition(null);
+
         // go to MainActivity
         Intent intent = new Intent(JourneyPlannerActivity.this, MainActivity.class);
 

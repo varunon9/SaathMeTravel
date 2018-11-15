@@ -20,6 +20,8 @@ public final class AppConstants {
                 "https://us-central1-saathmetravel.cloudfunctions.net";
         public static final String DIRECTIONS =
                 DOMAIN + "/api/directions/";
+        public static final String PLACE_SUMMARY =
+                "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=";
     }
 
     public static final int ACCESS_LOCATION_REQUEST_CODE = 1;

@@ -7,6 +7,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -94,7 +95,8 @@ public class GeneralUtility {
     }
 
     // being used for nearby
-    public void showTravellersOnMap(GoogleMap googleMap, QuerySnapshot querySnapshot) {
+    public void showTravellersOnMap(GoogleMap googleMap, QuerySnapshot querySnapshot,
+                                    CameraPosition cameraPosition) {
         if (googleMap != null) {
             //googleMap.clear();
             LatLng latLng = null;
@@ -111,9 +113,15 @@ public class GeneralUtility {
                     e.printStackTrace();
                 }
             }
-            // animate for last location, zoom level = 10 (city)
-            if (latLng != null) {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+            if (cameraPosition != null) {
+                // user has already seen the map, set camera position as what was left
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cameraPosition.target,
+                        cameraPosition.zoom));
+            } else {
+                // animate for last location, zoom level = 10 (city)
+                if (latLng != null) {
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                }
             }
         }
     }

@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -34,8 +35,12 @@ public class MapUtility {
     }
 
     public void drawPathBetweenTwoLatLng(GoogleMap googleMap,
-                                         LatLng sourceLatLng, LatLng destinationLatLng) {
-        if (googleMap == null) {
+                                         LatLng sourceLatLng,
+                                         LatLng destinationLatLng,
+                                         CameraPosition cameraPosition) {
+
+        // if cameraPosition is not null, that means path has already been drawn
+        if (googleMap == null || cameraPosition != null) {
             return;
         }
 

@@ -367,6 +367,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop called");
+        if (mMap != null) {
+            // recording current camera position
+            singleton.setGoogleMapCurrentCameraPosition(mMap.getCameraPosition());
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy called");
@@ -408,7 +418,8 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onSuccess(Object object) {
                         QuerySnapshot querySnapshot = (QuerySnapshot) object;
-                        generalUtility.showTravellersOnMap(mMap, querySnapshot);
+                        generalUtility.showTravellersOnMap(mMap, querySnapshot,
+                                singleton.getGoogleMapCurrentCameraPosition());
                         if (querySnapshot.isEmpty()) {
                             showMessage("No nearby travellers found.");
                         } else {
@@ -451,7 +462,8 @@ public class MainActivity extends AppCompatActivity
                                                 }
                                             }
 
-                                            mapUtility.drawPathBetweenTwoLatLng(mMap, sourceLatLng, destinationLatLng);
+                                            mapUtility.drawPathBetweenTwoLatLng(mMap, sourceLatLng,
+                                                    destinationLatLng, singleton.getGoogleMapCurrentCameraPosition());
 
                                             if (userUidSet.isEmpty()) {
                                                 showMessage("No Fellow travellers found. Plan different travel");

@@ -52,12 +52,9 @@ public class ChatListRecyclerViewAdapter extends
                 .convertDateToChatDateFormat(mValues.get(position).getUpdatedAt())
         );
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                chatViewModel.setSelectedChat(holder.mItem);
-                chatFragmentActivity.goToChatFragment();
-            }
+        holder.mView.setOnClickListener(v -> {
+            chatViewModel.setSelectedChat(holder.mItem);
+            chatFragmentActivity.goToChatFragment();
         });
     }
 

@@ -11,6 +11,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -33,6 +34,7 @@ public class Singleton {
     private LocationManager locationManager;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private RequestQueue requestQueue;
+    private CameraPosition googleMapCurrentCameraPosition;
 
     // assuming that new update is available, once fetched from remote config, will set to false
     private boolean updateAvailable = true;
@@ -150,5 +152,13 @@ public class Singleton {
 
     public void setUpdateAvailable(boolean updateAvailable) {
         this.updateAvailable = updateAvailable;
+    }
+
+    public CameraPosition getGoogleMapCurrentCameraPosition() {
+        return googleMapCurrentCameraPosition;
+    }
+
+    public void setGoogleMapCurrentCameraPosition(CameraPosition googleMapCurrentCameraPosition) {
+        this.googleMapCurrentCameraPosition = googleMapCurrentCameraPosition;
     }
 }
