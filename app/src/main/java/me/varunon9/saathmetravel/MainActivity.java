@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -462,8 +463,7 @@ public class MainActivity extends AppCompatActivity
                                                 }
                                             }
 
-                                            mapUtility.drawPathBetweenTwoLatLng(mMap, sourceLatLng,
-                                                    destinationLatLng, singleton.getGoogleMapCurrentCameraPosition());
+                                            mapUtility.drawPathBetweenTwoLatLng(mMap, singleton);
 
                                             if (userUidSet.isEmpty()) {
                                                 showMessage("No Fellow travellers found. Plan different travel");
@@ -517,6 +517,11 @@ public class MainActivity extends AppCompatActivity
                     bundle.putInt(AppConstants.NAVIGATION_ITEM, R.id.nav_profile);
                     goToChatFragmentActivity(bundle);
                 }
+            }
+        } catch (ClassCastException e) {
+            Place place = (Place) marker.getTag();
+            if (place != null) {
+                goToPlaceDetailsActivity(place);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -647,5 +652,13 @@ public class MainActivity extends AppCompatActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void goToPlaceDetailsActivity(Place place) {
+        Bundle bundle = new Bundle();
+        bundle.putString("id", place.getId());
+        Intent intent = new Intent(MainActivity.this, PlaceDetailActivity.class);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 }

@@ -236,7 +236,11 @@ public class GeneralUtility {
         Place place = new Place() {
             @Override
             public String getId() {
-                return null;
+                if (isSourcePlace) {
+                    return searchHistory.getSourcePlaceId();
+                } else {
+                    return searchHistory.getDestinationPlaceId();
+                }
             }
 
             @Override

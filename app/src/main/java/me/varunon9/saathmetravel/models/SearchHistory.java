@@ -13,6 +13,8 @@ public class SearchHistory {
     private GeoPoint destinationLocation;
     private String sourceAddress;
     private String destinationAddress;
+    private String sourcePlaceId;
+    private String destinationPlaceId;
 
     private @ServerTimestamp Date createdAt;
 
@@ -74,5 +76,21 @@ public class SearchHistory {
 
     public void setDestinationAddress(String destinationAddress) {
         this.destinationAddress = destinationAddress;
+    }
+
+    public String getSourcePlaceId() {
+        return sourcePlaceId;
+    }
+
+    public void setSourcePlaceId(String sourcePlaceId) {
+        this.sourcePlaceId = sourcePlaceId;
+    }
+
+    public String getDestinationPlaceId() {
+        return destinationPlaceId;
+    }
+
+    public void setDestinationPlaceId(String destinationPlaceId) {
+        this.destinationPlaceId = destinationPlaceId;
     }
 }

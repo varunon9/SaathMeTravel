@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.varunon9.saathmetravel.R;
+import me.varunon9.saathmetravel.Singleton;
 import me.varunon9.saathmetravel.constants.AppConstants;
 import me.varunon9.saathmetravel.utils.ajax.AjaxCallback;
 import me.varunon9.saathmetravel.utils.ajax.AjaxUtility;
@@ -35,24 +36,31 @@ public class MapUtility {
     }
 
     public void drawPathBetweenTwoLatLng(GoogleMap googleMap,
-                                         LatLng sourceLatLng,
-                                         LatLng destinationLatLng,
-                                         CameraPosition cameraPosition) {
+                                         Singleton singleton) {
+
+        LatLng sourceLatLng =  singleton.getSourcePlace().getLatLng();
+        LatLng destinationLatLng = singleton.getDestinationPlace().getLatLng();
+        CameraPosition cameraPosition = singleton.getGoogleMapCurrentCameraPosition();
 
         // if cameraPosition is not null, that means path has already been drawn
         if (googleMap == null || cameraPosition != null) {
             return;
         }
 
+        int journeyDistance = (int) getDistanceBetweenLatLng(sourceLatLng, destinationLatLng);
+
         googleMap.addMarker(new MarkerOptions().position(sourceLatLng)
-                .title("source")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_time_to_leave)));
+                .title(singleton.getSourcePlace().getName().toString())
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_time_to_leave)))
+                .setTag(singleton.getSourcePlace());
 
         googleMap.addMarker(new MarkerOptions().position(destinationLatLng)
-                .title("destination")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_destination)));
+                .title(singleton.getDestinationPlace().getName().toString())
+                .snippet(journeyDistance + " KM far from " + singleton.getSourcePlace().getName())
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_destination)))
+                .setTag(singleton.getDestinationPlace());
 
-        int zoomLevel = getZoomLevelBasedOnSourceAndDestination(sourceLatLng, destinationLatLng);
+        int zoomLevel = getZoomLevelBasedOnSourceAndDestination(journeyDistance);
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sourceLatLng, zoomLevel));
 
         String directionApiUrl = getDirectionApiUrl(sourceLatLng, destinationLatLng);
@@ -88,18 +96,8 @@ public class MapUtility {
         return url;
     }
 
-    private int getZoomLevelBasedOnSourceAndDestination(LatLng sourceLatLng,
-                                                        LatLng destinationLatLng) {
+    private int getZoomLevelBasedOnSourceAndDestination(float distance) {
         int zoomLevel = 5;
-        Location sourceLocation = new Location("source");
-        sourceLocation.setLatitude(sourceLatLng.latitude);
-        sourceLocation.setLongitude(sourceLatLng.longitude);
-
-        Location destinationLocation = new Location("destination");
-        destinationLocation.setLatitude(destinationLatLng.latitude);
-        destinationLocation.setLongitude(destinationLatLng.longitude);
-
-        float distance = sourceLocation.distanceTo(destinationLocation) / 1000; // KM
         if (distance < 2) {
             zoomLevel = 12;
         } else if (distance < 8) {
@@ -119,5 +117,17 @@ public class MapUtility {
         Log.d(TAG, String.valueOf(zoomLevel));
 
         return zoomLevel;
+    }
+
+    private float getDistanceBetweenLatLng(LatLng sourceLatLng, LatLng destinationLatLng) {
+        Location sourceLocation = new Location("source");
+        sourceLocation.setLatitude(sourceLatLng.latitude);
+        sourceLocation.setLongitude(sourceLatLng.longitude);
+
+        Location destinationLocation = new Location("destination");
+        destinationLocation.setLatitude(destinationLatLng.latitude);
+        destinationLocation.setLongitude(destinationLatLng.longitude);
+
+        return (sourceLocation.distanceTo(destinationLocation) / 1000); // KM
     }
 }

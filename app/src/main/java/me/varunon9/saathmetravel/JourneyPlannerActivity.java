@@ -333,6 +333,8 @@ public class JourneyPlannerActivity extends AppCompatActivity {
         SearchHistory searchHistory = new SearchHistory();
         searchHistory.setSourceAddress(sourcePlace.getAddress().toString());
         searchHistory.setDestinationAddress(destinationPlace.getAddress().toString());
+        searchHistory.setSourcePlaceId(sourcePlace.getId());
+        searchHistory.setDestinationPlaceId(destinationPlace.getId());
 
         FirebaseUser firebaseUser = singleton.getFirebaseUser();
         searchHistory.setUserUid(firebaseUser.getUid());
