@@ -15,6 +15,8 @@ public class SearchHistory {
     private String destinationAddress;
     private String sourcePlaceId;
     private String destinationPlaceId;
+    private String sourcePlaceName;
+    private String destinationPlaceName;
 
     private @ServerTimestamp Date createdAt;
 
@@ -92,5 +94,21 @@ public class SearchHistory {
 
     public void setDestinationPlaceId(String destinationPlaceId) {
         this.destinationPlaceId = destinationPlaceId;
+    }
+
+    public String getSourcePlaceName() {
+        return sourcePlaceName;
+    }
+
+    public void setSourcePlaceName(String sourcePlaceName) {
+        this.sourcePlaceName = sourcePlaceName;
+    }
+
+    public String getDestinationPlaceName() {
+        return destinationPlaceName;
+    }
+
+    public void setDestinationPlaceName(String destinationPlaceName) {
+        this.destinationPlaceName = destinationPlaceName;
     }
 }

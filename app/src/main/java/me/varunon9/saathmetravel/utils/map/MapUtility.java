@@ -47,6 +47,12 @@ public class MapUtility {
             return;
         }
 
+        // User searched using Old SearchHistory
+        if (singleton.getSourcePlace().getName() == null
+                || singleton.getDestinationPlace().getName() == null) {
+            return;
+        }
+
         int journeyDistance = (int) getDistanceBetweenLatLng(sourceLatLng, destinationLatLng);
 
         googleMap.addMarker(new MarkerOptions().position(sourceLatLng)

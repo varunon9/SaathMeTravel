@@ -265,7 +265,11 @@ public class GeneralUtility {
 
             @Override
             public CharSequence getName() {
-                return null;
+                if (isSourcePlace) {
+                    return searchHistory.getSourcePlaceName();
+                } else {
+                    return searchHistory.getDestinationPlaceName();
+                }
             }
 
             @Override

@@ -205,7 +205,9 @@ public class JourneyPlannerActivity extends AppCompatActivity {
             showMessage("Please enter source as well as destination");
             return;
         }
-        if (singleton.getFirebaseUser() != null) {
+
+        // view will be null when initiated from search history, not saving in that case
+        if (singleton.getFirebaseUser() != null && view != null) {
             saveSearchHistory(sourcePlace, destinationPlace, singleton);
         }
 
@@ -335,6 +337,8 @@ public class JourneyPlannerActivity extends AppCompatActivity {
         searchHistory.setDestinationAddress(destinationPlace.getAddress().toString());
         searchHistory.setSourcePlaceId(sourcePlace.getId());
         searchHistory.setDestinationPlaceId(destinationPlace.getId());
+        searchHistory.setSourcePlaceName(sourcePlace.getName().toString());
+        searchHistory.setDestinationPlaceName(destinationPlace.getName().toString());
 
         FirebaseUser firebaseUser = singleton.getFirebaseUser();
         searchHistory.setUserUid(firebaseUser.getUid());
