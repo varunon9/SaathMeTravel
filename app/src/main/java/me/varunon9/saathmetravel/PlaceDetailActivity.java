@@ -1,5 +1,6 @@
 package me.varunon9.saathmetravel;
 
+import android.app.ProgressDialog;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,6 +20,15 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import com.google.android.gms.location.places.Place;
+
+import me.varunon9.saathmetravel.ui.place.AddPlaceReviewFragment;
+import me.varunon9.saathmetravel.ui.place.PlaceDetailsFragment;
+import me.varunon9.saathmetravel.ui.place.PlaceReviewsFragment;
+import me.varunon9.saathmetravel.utils.FirestoreDbUtility;
+import me.varunon9.saathmetravel.utils.GeneralUtility;
+import me.varunon9.saathmetravel.utils.ajax.AjaxUtility;
+
 public class PlaceDetailActivity extends AppCompatActivity {
 
     /**
@@ -35,6 +45,15 @@ public class PlaceDetailActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+
+    private Singleton singleton;
+    private String TAG = "PlaceDetailActivity";
+    private ProgressDialog progressDialog;
+    public FirestoreDbUtility firestoreDbUtility;
+    public GeneralUtility generalUtility;
+    public AjaxUtility ajaxUtility;
+    public Place selectedPlace;
+    public String selectedPlaceExtract = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,22 +75,38 @@ public class PlaceDetailActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        // display back button in action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        singleton = Singleton.getInstance(getApplicationContext());
+        firestoreDbUtility = new FirestoreDbUtility();
+        generalUtility = new GeneralUtility();
+        ajaxUtility = new AjaxUtility(getApplicationContext());
+
+        Bundle bundle = getIntent().getExtras();
+        String placeId = bundle.getString("id");
+        if (placeId != null) {
+            if (placeId.equals(singleton.getSourcePlace().getId())) {
+                selectedPlace = singleton.getSourcePlace();
+            } else {
+                selectedPlace = singleton.getDestinationPlace();
+            }
+        }
+
+        getSupportActionBar().setTitle(selectedPlace.getName());
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_place_detail, menu);
+        //getMenuInflater().inflate(R.menu.menu_place_detail, menu);
         return true;
     }
 
@@ -91,41 +126,6 @@ public class PlaceDetailActivity extends AppCompatActivity {
     }
 
     /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_place_detail, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
-
-    /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
@@ -137,9 +137,16 @@ public class PlaceDetailActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            Fragment fragment = null;
+            switch (position) {
+                case 0: fragment = new PlaceDetailsFragment();
+                    break;
+                case 1: fragment = new PlaceReviewsFragment();
+                    break;
+                case 2: fragment = new AddPlaceReviewFragment();
+                    break;
+            }
+            return fragment;
         }
 
         @Override
@@ -147,5 +154,26 @@ public class PlaceDetailActivity extends AppCompatActivity {
             // Show 3 total pages.
             return 3;
         }
+    }
+
+    public void showProgressDialog(String title, String message, boolean isCancellable) {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(PlaceDetailActivity.this);
+        }
+        progressDialog.setTitle(title);
+        progressDialog.setMessage(message);
+        progressDialog.setCancelable(isCancellable);
+        progressDialog.show();
+    }
+
+    public void dismissProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+    }
+
+    public void showMessage(String message) {
+        View parentLayout = findViewById(R.id.container);
+        Snackbar.make(parentLayout, message, Snackbar.LENGTH_LONG).show();
     }
 }

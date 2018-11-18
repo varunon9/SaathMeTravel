@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity
     private GeneralUtility generalUtility;
     private FirestoreDbUtility firestoreDbUtility;
     private MapUtility mapUtility;
+    private TextView startJourneyTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        startJourneyTextView = findViewById(R.id.startJourneyTextView);
 
         singleton = Singleton.getInstance(getApplicationContext());
 
@@ -362,7 +364,9 @@ public class MainActivity extends AppCompatActivity
         }
         if (singleton.getSourcePlace() != null && singleton.getDestinationPlace() != null) {
             showFellowTravellersOnMap(singleton);
+            startJourneyTextView.setText("Replan Your Journey");
         } else {
+            startJourneyTextView.setText("Start Your Journey");
             showNearbyTravellersOnMap(location);
         }
     }

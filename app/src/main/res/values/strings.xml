@@ -26,8 +26,11 @@
     </string>
     <string name="default_notification_channel_id">SaathMeTravel</string>
     <string name="title_activity_place_detail">PlaceDetailActivity</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
-    <string name="tab_text_3">Tab 3</string>
+    <string name="tab_text_place_details">Details</string>
+    <string name="tab_text_reviews">Reviews</string>
+    <string name="tab_text_add_review">Add Review</string>
     <string name="section_format">Hello World from section: %1$d</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
