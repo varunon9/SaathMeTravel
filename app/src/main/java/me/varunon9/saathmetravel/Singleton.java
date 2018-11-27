@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import me.varunon9.saathmetravel.constants.AppConstants;
+import me.varunon9.saathmetravel.models.User;
 
 /**
  * This class contains global variables
@@ -35,6 +36,7 @@ public class Singleton {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private RequestQueue requestQueue;
     private CameraPosition googleMapCurrentCameraPosition;
+    private User loggedInUser;
 
     // assuming that new update is available, once fetched from remote config, will set to false
     private boolean updateAvailable = true;
@@ -160,5 +162,13 @@ public class Singleton {
 
     public void setGoogleMapCurrentCameraPosition(CameraPosition googleMapCurrentCameraPosition) {
         this.googleMapCurrentCameraPosition = googleMapCurrentCameraPosition;
+    }
+
+    public User getLoggedInUser() {
+        return loggedInUser;
+    }
+
+    public void setLoggedInUser(User loggedInUser) {
+        this.loggedInUser = loggedInUser;
     }
 }

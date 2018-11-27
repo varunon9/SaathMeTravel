@@ -55,6 +55,7 @@ public final class AppConstants {
         public static final String SEARCH_HISTORIES = "searchHistories";
         public static final String CHATS = "chats";
         public static final String CHAT_MESSAGES = "chatMessages";
+        public static final String PLACE_REVIEWS = "placeReviews";
     }
 
     // default/fallback location would be Bangalore

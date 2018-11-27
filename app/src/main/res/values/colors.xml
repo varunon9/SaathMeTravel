@@ -6,4 +6,5 @@
     <color name="colorWhite">#FFF</color>
     <color name="colorShadow">#cacacaca</color>
     <color name="colorShadowLight">#cae6e4e4</color>
+    <color name="colorBlack">#333</color>
 </resources>

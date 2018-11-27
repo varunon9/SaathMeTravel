@@ -133,7 +133,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         gender = AppConstants.Gender.FEMALE;
                     }
 
-                    if (name == null || preference == null || gender == null) {
+                    if (name.isEmpty()|| preference.isEmpty() || gender.isEmpty()) {
                         chatFragmentActivity.showMessage("All fields are mandatory");
                         return;
                     }
@@ -164,6 +164,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     public void onSuccess(Object object) {
                         chatFragmentActivity.dismissProgressDialog();
                         chatFragmentActivity.showMessage("Profile updated!");
+
+                        // object is null todo: update loggedInUser from singleton
+                        /*DocumentSnapshot documentSnapshot = (DocumentSnapshot) object;
+                        User loggedInUser = documentSnapshot.toObject(User.class);
+                        chatFragmentActivity.singleton.setLoggedInUser(loggedInUser);*/
                     }
 
                     @Override

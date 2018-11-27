@@ -117,6 +117,10 @@ public class ChatFragment extends Fragment {
     }
 
     private void updateLastSeen(User recipientUser) {
+        if (recipientUser == null) {
+            // deleted from firestore db?
+            return;
+        }
         // update online or last seen
         String title = recipientUser.getName();
         if (title == null) {

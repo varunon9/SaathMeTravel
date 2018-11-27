@@ -46,7 +46,7 @@ public class PlaceDetailActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
-    private Singleton singleton;
+    public Singleton singleton;
     private String TAG = "PlaceDetailActivity";
     private ProgressDialog progressDialog;
     public FirestoreDbUtility firestoreDbUtility;

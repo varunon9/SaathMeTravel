@@ -104,6 +104,10 @@ public class PlaceDetailsFragment extends Fragment {
                     placeDescriptionTextView.setText(extract);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    // to fill the gap and prevent further request
+                    placeDetailActivity.selectedPlaceExtract = placeDetailActivity
+                            .selectedPlace.getName().toString();
+                    placeDescriptionTextView.setText(placeDetailActivity.selectedPlaceExtract);
                 }
             }
 

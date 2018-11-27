@@ -37,6 +37,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -329,6 +330,7 @@ public class MainActivity extends AppCompatActivity
 
                 // todo: set profile pic when loggedIn
                 navigationHeaderImageView.setImageResource(R.mipmap.ic_account);
+                getCurrentLoggedInUser();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -583,6 +585,7 @@ public class MainActivity extends AppCompatActivity
                             @Override
                             protected void onPostExecute(Void result) {
                                 singleton.setFirebaseUser(null);
+                                singleton.setLoggedInUser(null);
                                 refreshMainActivity();
                             }
                         }.execute();
@@ -664,5 +667,30 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(MainActivity.this, PlaceDetailActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    private void getCurrentLoggedInUser() {
+        String userUid = singleton.getFirebaseUser().getUid();
+        if (userUid.isEmpty() || singleton.getLoggedInUser() != null) {
+            return; // only one time
+        }
+        try {
+            firestoreDbUtility.getOne(AppConstants.Collections.USERS, userUid,
+                    new FirestoreDbOperationCallback() {
+                        @Override
+                        public void onSuccess(Object object) {
+                            DocumentSnapshot documentSnapshot = (DocumentSnapshot) object;
+                            User currentUser = documentSnapshot.toObject(User.class);
+                            singleton.setLoggedInUser(currentUser);
+                        }
+
+                        @Override
+                        public void onFailure(Object object) {
+                            showMessage("Failed to login");
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

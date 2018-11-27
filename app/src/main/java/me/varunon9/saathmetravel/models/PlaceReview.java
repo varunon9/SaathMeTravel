@@ -9,7 +9,7 @@ public class PlaceReview {
     private String id;
     private String placeId;
     private String userUid;
-    private int rating;
+    private float rating;
     private String review;
     private String reviewerName;
     private @ServerTimestamp Date createdAt;
@@ -44,11 +44,11 @@ public class PlaceReview {
         this.userUid = userUid;
     }
 
-    public int getRating() {
+    public float getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(float rating) {
         this.rating = rating;
     }
 

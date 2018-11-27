@@ -25,6 +25,7 @@ public class ChatFragmentActivity extends AppCompatActivity {
     public String chatInitiatorUid; // logged-in user uid
     public String chatRecipientUid; // will be null when clicked on chats menu item
     public String chatInitiatorName; // logged-in user name
+    public Singleton singleton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,7 @@ public class ChatFragmentActivity extends AppCompatActivity {
 
         firestoreDbUtility = new FirestoreDbUtility();
         generalUtility = new GeneralUtility();
+        singleton = Singleton.getInstance(getApplicationContext());
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
