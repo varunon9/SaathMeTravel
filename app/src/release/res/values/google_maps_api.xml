@@ -15,9 +15,9 @@
 
     Once you have your key (it starts with "AIza"), replace the "google_maps_key"
     string in this file.
-    AIzaSyCzXnYZuVd-6Ked8spzUkJk8W34zQU2uGw // SellMyServices API key
+    Rename google_maps_key_release to google_maps_key
     -->
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
-        AIzaSyBRnhNjfzM_gC4KUNvTn3Qi-5EcKoBNC0Y
+    <string name="google_maps_key_release" templateMergeStrategy="preserve" translatable="false">
+        YOUR_API_KEY
     </string>
 </resources>

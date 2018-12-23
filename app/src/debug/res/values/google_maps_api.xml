@@ -9,7 +9,7 @@
     You can also add your credentials to an existing key, using these values:
 
     Package name:
-    50:FE:C3:9F:74:2F:3D:F2:12:BD:C2:13:1A:99:C7:D3:C8:20:86:F6
+    me.varunon9.saathmetravel
 
     SHA-1 certificate fingerprint:
     50:FE:C3:9F:74:2F:3D:F2:12:BD:C2:13:1A:99:C7:D3:C8:20:86:F6
@@ -19,9 +19,9 @@
 
     Once you have your key (it starts with "AIza"), replace the "google_maps_key"
     string in this file.
-    AIzaSyCzXnYZuVd-6Ked8spzUkJk8W34zQU2uGw // SellMyServices API key
+    Rename google_maps_key_debug to google_maps_key
     -->
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
-         AIzaSyBRnhNjfzM_gC4KUNvTn3Qi-5EcKoBNC0Y
+    <string name="google_maps_key_debug" templateMergeStrategy="preserve" translatable="false">
+         YOUR_API_KEY
     </string>
 </resources>
