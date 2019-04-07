@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/varunon9/SaathMeTravel#readme",
   "dependencies": {
+    "body-parser": "^1.18.3",
     "bunyan": "^1.8.12",
     "express": "^4.16.4",
     "fs": "^0.0.1-security"
