@@ -27,10 +27,26 @@ app.get('/', function(req, res) {
 });
 
 app.post('/extranet/feedback', function(req, res) {
-  logger.info(req.body);
+  // todo: extract token from query params and validate it
+  const feedback = req.body;
+
+  // validate that request came from Gmail using proxy assertion token
+  const proxyAssertionToken = req.get('Amp4Email-Proxy-Assertion');
+  // todo
+  res.set({
+    'Access-Control-Allow-Origin': 'https://mail.google.com',
+    'AMP-Access-Control-Allow-Source-Origin': 'info@saathmetravel.com',
+    'Access-Control-Allow-Source-Origin': 
+      'AMP-Access-Control-Allow-Source-Origin',
+    'Access-Control-Expose-Headers': 'Access-Control-Allow-Origin'
+      + ', AMP-Access-Control-Allow-Source-Origin'
+      + ', Access-Control-Allow-Source-Origin'
+  });
+
   res.json({
     success: true,
-    message: 'Thank you for your feedback.'
+    message: 'Thank you for your feedback.',
+    feedback
   });
 });
 
