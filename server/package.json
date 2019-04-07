@@ -1,0 +1,31 @@
+{
+  "name": "saathmetravel",
+  "version": "1.0.0",
+  "description": "A social travelling app to match the travellers sharing a common journey.",
+  "main": "./bin/www",
+  "scripts": {
+    "start": "export NODE_ENV=production && pm2 start ./bin/www",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/varunon9/SaathMeTravel.git"
+  },
+  "keywords": [
+    "travel",
+    "serverless",
+    "firebase",
+    "chat-application"
+  ],
+  "author": "Varun Kumar <varunon9@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/varunon9/SaathMeTravel/issues"
+  },
+  "homepage": "https://github.com/varunon9/SaathMeTravel#readme",
+  "dependencies": {
+    "bunyan": "^1.8.12",
+    "express": "^4.16.4",
+    "fs": "^0.0.1-security"
+  }
+}

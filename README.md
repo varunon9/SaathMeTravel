@@ -24,7 +24,7 @@ You can take ideas from them, discuss plannings or even travel together.
 
 ### Setting the project in AndroidStudio
 
-1. Clone the project/download zip
+1. Clone the project/download zip `git clone https://github.com/varunon9/SaathMeTravel.git`
 2. Import it in AndroidStudio
 3. Add `SAATHMETRAVEL_GOOGLE_MAPS_API_KEY=AIza...` in `~/.gradle/gradle.properties` file (inside home folder)
 4. Replace Aiza... with your google map api key. You can get it from https://developers.google.com/maps/documentation/android-sdk/signup

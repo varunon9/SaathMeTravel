@@ -1,0 +1,11 @@
+{
+  "apps": [
+    {
+      "name": "saathmetravel",
+      "script": "bin/www",
+      "error_file": "/logs/saathmetravel-error.log",
+      "out_file": "/logs/saathmetravel-info.log",
+      "exec_mode" : "cluster"
+    }
+  ]
+}
