@@ -4,7 +4,7 @@
   "description": "A social travelling app to match the travellers sharing a common journey.",
   "main": "./bin/www",
   "scripts": {
-    "start": "export NODE_ENV=production && pm2 start ./bin/www",
+    "start": "export NODE_ENV=prod && pm2 start ./bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -10,5 +10,9 @@ module.exports = {
   'prodpp': {
     port: '3000',
     logDirectory: '/logs'
+  },
+  'production': {
+    port: '3000',
+    logDirectory: '/logs'
   }
 };
